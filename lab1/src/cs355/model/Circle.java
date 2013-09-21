@@ -1,3 +1,4 @@
+
 package cs355.model;
 
 import java.awt.Color;
@@ -7,21 +8,24 @@ public class Circle extends Ellipse
 {
 	// Variables
 	private int radius = 0;
+
 	// Constructor
-	public Circle(Color col, Point c, int r)
+	public Circle(Color color, Point center, int diameter)
 	{
-		super(col, c, r, r);
-		this.radius = r;
+		super(color, center, diameter, diameter);
+		this.radius = diameter / 2;
 	}
-	
+
 	// Methods
 	public int getRadius()
 	{
 		return this.radius;
 	}
-	
-	public void setRadius(int r)
+
+	public void setRadius(int radius)
 	{
-		this.radius = r;
+		this.radius = radius;
+		super.setHeight(2 * radius);
+		super.setWidth(2 * radius);
 	}
 }

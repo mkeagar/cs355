@@ -1,3 +1,4 @@
+
 package cs355.model;
 
 import java.awt.Color;
@@ -9,7 +10,7 @@ public class Rectangle extends Shape
 	private Point upperLeftCorner = null;
 	private int height = 0;
 	private int width = 0;
-	
+
 	// Constructor
 	public Rectangle(Color col, Point p, int h, int w)
 	{
@@ -18,31 +19,31 @@ public class Rectangle extends Shape
 		this.height = h;
 		this.width = w;
 	}
-	
-	//Methods
-	public Point getUpperLeftCorner()
-	{
-		return this.upperLeftCorner;
-	}
-	
-	public void setUpperLeftCorner(Point p)
-	{
-		this.upperLeftCorner = p;
-	}
-	
+
 	public int getHeight()
 	{
 		return this.height;
 	}
-	
+
+	// Methods
+	public Point getUpperLeftCorner()
+	{
+		return this.upperLeftCorner;
+	}
+
+	public int getWidth()
+	{
+		return this.width;
+	}
+
 	public void setHeight(int h)
 	{
 		this.height = h;
 	}
-	
-	public int getWidth()
+
+	public void setUpperLeftCorner(Point p)
 	{
-		return this.width;
+		this.upperLeftCorner = p;
 	}
 
 	public void setWidth(int w)
@@ -51,4 +52,3 @@ public class Rectangle extends Shape
 	}
 
 }
-

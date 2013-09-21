@@ -1,3 +1,4 @@
+
 package cs355.model;
 
 import java.awt.Color;
@@ -5,18 +6,18 @@ import java.awt.Point;
 
 public class Ellipse extends Shape
 {
-	//Variables
+	// Variables
 	private Point center = null;
 	private int height = 0;
 	private int width = 0;
-	
-	//Constructor
-	public Ellipse(Color col, Point c, int h, int w)
+
+	// Constructor
+	public Ellipse(Color color, Point center, int height, int width)
 	{
-		super(col);
-		this.center = c;
-		this.height = h;
-		this.width = w;		
+		super(color);
+		this.center = center;
+		this.height = height;
+		this.width = width;
 	}
 
 	public Point getCenter()
@@ -24,19 +25,9 @@ public class Ellipse extends Shape
 		return this.center;
 	}
 
-	public void setCenter(Point c)
-	{
-		this.center = c;
-	}
-
 	public int getHeight()
 	{
 		return this.height;
-	}
-
-	public void setHeight(int h)
-	{
-		this.height = h;
 	}
 
 	public int getWidth()
@@ -44,11 +35,19 @@ public class Ellipse extends Shape
 		return this.width;
 	}
 
-	public void setWidth(int w)
+	public void setCenter(Point center)
 	{
-		this.width = w;
+		this.center = center;
 	}
-	
-	
+
+	public void setHeight(int height)
+	{
+		this.height = height;
+	}
+
+	public void setWidth(int width)
+	{
+		this.width = width;
+	}
 
 }

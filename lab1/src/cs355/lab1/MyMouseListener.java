@@ -1,3 +1,4 @@
+
 package cs355.lab1;
 
 import java.awt.event.MouseEvent;
@@ -9,23 +10,23 @@ public class MyMouseListener implements MouseListener
 
 	// Singleton Stuff
 	private static MyMouseListener instance = null;
-	
+
 	// Singleton Method
 	public static MyMouseListener inst()
 	{
-		if (instance == null)
+		if(instance == null)
 		{
 			instance = new MyMouseListener();
 		}
 		return instance;
 	}
-	
+
 	// Constructor
 	protected MyMouseListener()
 	{
 		// Exists only to defeat instantiation
 	}
-	
+
 	// Methods
 	@Override
 	public void mouseClicked(MouseEvent me)

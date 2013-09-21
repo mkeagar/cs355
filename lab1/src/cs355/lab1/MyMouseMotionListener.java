@@ -1,3 +1,4 @@
+
 package cs355.lab1;
 
 import java.awt.event.MouseEvent;
@@ -5,15 +6,15 @@ import java.awt.event.MouseMotionListener;
 
 public class MyMouseMotionListener implements MouseMotionListener
 {
-	//Variables
-	
+	// Variables
+
 	// Singleton Stuff
 	private static MyMouseMotionListener instance = null;
-	
+
 	// Singleton Method
 	public static MyMouseMotionListener inst()
 	{
-		if (instance == null)
+		if(instance == null)
 		{
 			instance = new MyMouseMotionListener();
 		}
@@ -25,8 +26,8 @@ public class MyMouseMotionListener implements MouseMotionListener
 	{
 		// Exists only to defeat instantiation
 	}
-	
-	//Methods
+
+	// Methods
 
 	@Override
 	public void mouseDragged(MouseEvent me)
