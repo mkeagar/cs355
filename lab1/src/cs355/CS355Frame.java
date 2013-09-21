@@ -6,6 +6,7 @@ package cs355;
 
 import static cs355.CS355SScrollbarAttrConsts.H_SCROLL_BAR;
 import static cs355.CS355SScrollbarAttrConsts.MIN;
+
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.event.MouseListener;
@@ -14,6 +15,7 @@ import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.swing.JColorChooser;
 import javax.swing.JScrollBar;
 
