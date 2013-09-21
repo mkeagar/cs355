@@ -89,7 +89,6 @@ public class Controller implements CS355Controller
 	{
 		this.resetState();
 		this.currentState = ControllerState.LINE;
-		System.out.println("Current State: Line\n");
 	}
 
 	public void processClicked(Point p)
@@ -101,7 +100,6 @@ public class Controller implements CS355Controller
 		case TRIANGLE:
 			this.triCornArray[this.triCornCount] = p;
 			this.triCornCount++;
-			System.out.println("Case Triangle: Point count: " + this.triCornCount);
 			if(this.triCornCount == 3)
 			{
 				this.triCornCount = 0;
