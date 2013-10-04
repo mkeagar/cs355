@@ -51,4 +51,9 @@ public class Rectangle extends Shape
 		this.width = w;
 	}
 
+	@Override
+	public String toString()
+	{
+		return "Rectangle [upperLeftCorner=" + upperLeftCorner + ", height=" + height + ", width=" + width + "]";
+	}
 }

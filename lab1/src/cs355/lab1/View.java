@@ -42,12 +42,14 @@ public class View implements ViewRefresher
 				Line temp = (Line) currentShape;
 				g2d.setColor(temp.getColor());
 				g2d.drawLine(temp.getStart().x, temp.getStart().y, temp.getEnd().x, temp.getEnd().y);
+				currentShape = null;
 			}
 			else if(currentShape instanceof Rectangle)
 			{
 				Rectangle rectangle = (Rectangle) currentShape;
 				g2d.setColor(rectangle.getColor());
 				g2d.fillRect(rectangle.getUpperLeftCorner().x, rectangle.getUpperLeftCorner().y, rectangle.getWidth(), rectangle.getHeight());
+				currentShape = null;
 			}
 			else if(currentShape instanceof Ellipse)
 			{
@@ -55,6 +57,7 @@ public class View implements ViewRefresher
 				Point upLeft = new Point(ellipse.getCenter().x - (ellipse.getWidth() / 2), ellipse.getCenter().y - (ellipse.getHeight() / 2));
 				g2d.setColor(ellipse.getColor());
 				g2d.fillOval(upLeft.x, upLeft.y, ellipse.getWidth(), ellipse.getHeight());
+				currentShape = null;
 			}
 			else if(currentShape instanceof Triangle)
 			{
@@ -73,7 +76,6 @@ public class View implements ViewRefresher
 
 				g2d.setColor(triangle.getColor());
 				g2d.fillPolygon(xArr, yArr, numPoints);
-
 			}
 
 		}

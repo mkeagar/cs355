@@ -6,7 +6,7 @@ import java.util.ArrayList;
 public class Model
 {
 	// Variables
-	private ArrayList<Shape> shapes = new ArrayList<Shape>();
+	private final ArrayList<Shape> shapes = new ArrayList<Shape>();
 
 	// Singleton Stuff
 	private static Model instance = null;
@@ -28,10 +28,9 @@ public class Model
 	}
 
 	// Methods
-	public int addShape(Shape shape)
+	public void addShape(Shape shape)
 	{
 		this.shapes.add(shape);
-		return this.shapes.indexOf(shape);
 	}
 
 	public Shape getShape(int index)

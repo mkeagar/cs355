@@ -4,6 +4,8 @@ package cs355.lab1;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 
+import cs355.lab1.Controller.MouseButtonState;
+
 public class MyMouseMotionListener implements MouseMotionListener
 {
 	// Variables
@@ -32,7 +34,25 @@ public class MyMouseMotionListener implements MouseMotionListener
 	@Override
 	public void mouseDragged(MouseEvent me)
 	{
-		Controller.inst().processDragged(me.getPoint());
+		if(Controller.inst().getMouseButtonState() == MouseButtonState.LEFT)
+		{
+			switch(me.getButton())
+			{
+			case 0:
+				Controller.inst().processDragged(me.getPoint());
+				break;
+
+			case 1:
+				break;
+			case 2:
+				break;
+
+			case 3:
+				break;
+
+			}
+		}
+
 	}
 
 	@Override

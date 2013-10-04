@@ -39,4 +39,9 @@ public class Line extends Shape
 		this.start = s;
 	}
 
+	@Override
+	public String toString()
+	{
+		return "Line [start=" + start + ", end=" + end + "]";
+	}
 }

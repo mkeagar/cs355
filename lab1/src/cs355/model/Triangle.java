@@ -50,4 +50,11 @@ public class Triangle extends Shape
 	{
 		this.pointC = pointC;
 	}
+
+	@Override
+	public String toString()
+	{
+		return "Triangle [pointA=" + pointA + ", pointB=" + pointB + ", pointC=" + pointC + "]";
+	}
+
 }

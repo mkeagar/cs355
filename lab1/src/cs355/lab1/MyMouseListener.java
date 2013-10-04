@@ -4,6 +4,8 @@ package cs355.lab1;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
+import cs355.lab1.Controller.MouseButtonState;
+
 public class MyMouseListener implements MouseListener
 {
 	// Variables
@@ -31,7 +33,23 @@ public class MyMouseListener implements MouseListener
 	@Override
 	public void mouseClicked(MouseEvent me)
 	{
-		Controller.inst().processClicked(me.getPoint());
+		switch(me.getButton())
+		{
+		case 0:
+			Controller.inst().setMouseButtonState(MouseButtonState.NONE);
+			break;
+
+		case 1:
+			Controller.inst().setMouseButtonState(MouseButtonState.LEFT);
+			Controller.inst().processClicked(me.getPoint());
+			break;
+
+		case 2:
+			break;
+
+		case 3:
+			break;
+		}
 	}
 
 	@Override
@@ -49,13 +67,45 @@ public class MyMouseListener implements MouseListener
 	@Override
 	public void mousePressed(MouseEvent me)
 	{
-		Controller.inst().processPressed(me.getPoint());
+		switch(me.getButton())
+		{
+		case 0:
+			Controller.inst().setMouseButtonState(MouseButtonState.NONE);
+			break;
+
+		case 1:
+			Controller.inst().setMouseButtonState(MouseButtonState.LEFT);
+			Controller.inst().processPressed(me.getPoint());
+			break;
+
+		case 2:
+			;
+			break;
+
+		case 3:
+			break;
+		}
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent me)
 	{
-		Controller.inst().processReleased(me.getPoint());
+		switch(me.getButton())
+		{
+		case 0:
+			break;
+
+		case 1:
+			Controller.inst().setMouseButtonState(MouseButtonState.NONE);
+			Controller.inst().processReleased(me.getPoint());
+			break;
+
+		case 2:
+			break;
+
+		case 3:
+			break;
+		}
 	}
 
 }

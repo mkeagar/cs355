@@ -50,4 +50,10 @@ public class Ellipse extends Shape
 		this.width = width;
 	}
 
+	@Override
+	public String toString()
+	{
+		return "Ellipse [center=" + center + ", height=" + height + ", width=" + width + "]";
+	}
+
 }

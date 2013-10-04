@@ -14,6 +14,7 @@ public class Circle extends Ellipse
 	{
 		super(color, center, diameter, diameter);
 		this.radius = diameter / 2;
+
 	}
 
 	// Methods
@@ -28,4 +29,11 @@ public class Circle extends Ellipse
 		super.setHeight(2 * radius);
 		super.setWidth(2 * radius);
 	}
+
+	@Override
+	public String toString()
+	{
+		return "Circle [radius=" + radius + "]";
+	}
+
 }

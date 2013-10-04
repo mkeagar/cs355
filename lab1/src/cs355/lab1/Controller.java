@@ -16,6 +16,12 @@ public class Controller implements CS355Controller
 		TRIANGLE, SQUARE, RECTANGLE, CIRCLE, ELLIPSE, LINE, SELECT, ZOOM_IN, ZOOM_OUT, H_SCROLL_BAR, V_SCROLL_BAR, FREE
 	};
 
+	public enum MouseButtonState
+	{
+		NONE, LEFT, MIDDLE, RIGHT
+	};
+
+	private MouseButtonState mouseButtonState = MouseButtonState.NONE;
 	private ControllerState currentState = ControllerState.FREE;
 	private Color currentColor = Color.white;
 	private Shape currentShape = null;
@@ -40,6 +46,16 @@ public class Controller implements CS355Controller
 	protected Controller()
 	{
 		// Exists only to defeat instantiation
+	}
+
+	public void setMouseButtonState(MouseButtonState mbs)
+	{
+		this.mouseButtonState = mbs;
+	}
+
+	public MouseButtonState getMouseButtonState()
+	{
+		return this.mouseButtonState;
 	}
 
 	@Override
@@ -105,6 +121,7 @@ public class Controller implements CS355Controller
 				this.triCornCount = 0;
 				this.currentShape = new Triangle(this.currentColor, this.triCornArray[0], this.triCornArray[1], this.triCornArray[2]);
 				Model.inst().addShape(this.currentShape);
+				this.currentShape = null;
 			}
 			break;
 
@@ -308,7 +325,10 @@ public class Controller implements CS355Controller
 
 		}
 
-		Model.inst().addShape(this.currentShape);
+		if(this.currentState != ControllerState.TRIANGLE)
+		{
+			Model.inst().addShape(this.currentShape);
+		}
 		GUIFunctions.refresh();
 	}
 

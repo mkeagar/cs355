@@ -28,4 +28,10 @@ public class Square extends Rectangle
 		super.setHeight(this.sideLength);
 		super.setWidth(this.sideLength);
 	}
+
+	@Override
+	public String toString()
+	{
+		return "Square [sideLength=" + sideLength + "]";
+	}
 }
