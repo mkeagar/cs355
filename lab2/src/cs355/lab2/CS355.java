@@ -3,7 +3,7 @@
  * the editor.
  */
 
-package cs355.lab1;
+package cs355.lab2;
 
 import java.awt.Color;
 

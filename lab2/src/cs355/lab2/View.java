@@ -1,5 +1,5 @@
 
-package cs355.lab1;
+package cs355.lab2;
 
 import java.awt.Graphics2D;
 import java.awt.Point;
