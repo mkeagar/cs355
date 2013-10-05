@@ -34,23 +34,10 @@ public class MyMouseMotionListener implements MouseMotionListener
 	@Override
 	public void mouseDragged(MouseEvent me)
 	{
+		// System.out.println(me.getButton());
 		if(Controller.inst().getMouseButtonState() == MouseButtonState.LEFT)
 		{
-			switch(me.getButton())
-			{
-			case 0:
-				Controller.inst().processDragged(me.getPoint());
-				break;
-
-			case 1:
-				break;
-			case 2:
-				break;
-
-			case 3:
-				break;
-
-			}
+			Controller.inst().processDragged(me.getPoint());
 		}
 
 	}

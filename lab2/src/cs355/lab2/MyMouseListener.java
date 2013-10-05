@@ -33,6 +33,7 @@ public class MyMouseListener implements MouseListener
 	@Override
 	public void mouseClicked(MouseEvent me)
 	{
+		// System.out.println(me.getButton());
 		switch(me.getButton())
 		{
 		case 0:
@@ -67,6 +68,7 @@ public class MyMouseListener implements MouseListener
 	@Override
 	public void mousePressed(MouseEvent me)
 	{
+		// System.out.println(me.getButton());
 		switch(me.getButton())
 		{
 		case 0:
@@ -90,6 +92,7 @@ public class MyMouseListener implements MouseListener
 	@Override
 	public void mouseReleased(MouseEvent me)
 	{
+		// System.out.println(me.getButton());
 		switch(me.getButton())
 		{
 		case 0:
