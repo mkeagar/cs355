@@ -1,4 +1,3 @@
-
 package cs355.model;
 
 import java.util.ArrayList;
@@ -14,7 +13,7 @@ public class Model
 	// Singleton Method
 	public static Model inst()
 	{
-		if(instance == null)
+		if (instance == null)
 		{
 			instance = new Model();
 		}

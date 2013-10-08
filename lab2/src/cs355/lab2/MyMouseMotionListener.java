@@ -1,4 +1,3 @@
-
 package cs355.lab2;
 
 import java.awt.event.MouseEvent;
@@ -16,7 +15,7 @@ public class MyMouseMotionListener implements MouseMotionListener
 	// Singleton Method
 	public static MyMouseMotionListener inst()
 	{
-		if(instance == null)
+		if (instance == null)
 		{
 			instance = new MyMouseMotionListener();
 		}
@@ -35,7 +34,7 @@ public class MyMouseMotionListener implements MouseMotionListener
 	public void mouseDragged(MouseEvent me)
 	{
 		// System.out.println(me.getButton());
-		if(Controller.inst().getMouseButtonState() == MouseButtonState.LEFT)
+		if (Controller.inst().getMouseButtonState() == MouseButtonState.LEFT)
 		{
 			Controller.inst().processDragged(me.getPoint());
 		}

@@ -1,4 +1,3 @@
-
 package cs355.model;
 
 import java.awt.Color;
@@ -15,9 +14,12 @@ public class Triangle extends Shape
 	public Triangle(Color color, Point a, Point b, Point c)
 	{
 		super(color);
-		this.pointA = a;
-		this.pointB = b;
-		this.pointC = c;
+		double x = (a.x + b.x + c.x) / 3.0;
+		double y = (a.y + b.y + c.y) / 3.0;
+		this.setOffset(new Point((int) x, (int) y));
+		this.pointA = new Point(a.x - this.getOffset().x, a.y - this.getOffset().y);
+		this.pointB = new Point(b.x - this.getOffset().x, b.y - this.getOffset().y);
+		this.pointC = new Point(c.x - this.getOffset().x, c.y - this.getOffset().y);
 	}
 
 	// Methods
@@ -38,17 +40,17 @@ public class Triangle extends Shape
 
 	public void setPointA(Point pointA)
 	{
-		this.pointA = pointA;
+		this.pointA = new Point(pointA.x - this.getOffset().x, pointA.y - this.getOffset().y);
 	}
 
 	public void setPointB(Point pointB)
 	{
-		this.pointB = pointB;
+		this.pointB = new Point(pointB.x - this.getOffset().x, pointB.y - this.getOffset().y);
 	}
 
 	public void setPointC(Point pointC)
 	{
-		this.pointC = pointC;
+		this.pointC = new Point(pointC.x - this.getOffset().x, pointC.y - this.getOffset().y);
 	}
 
 	@Override

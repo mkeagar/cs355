@@ -1,4 +1,3 @@
-
 package cs355.model;
 
 import java.awt.Color;

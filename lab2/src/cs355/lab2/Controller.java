@@ -1,4 +1,3 @@
-
 package cs355.lab2;
 
 import java.awt.Color;
@@ -25,9 +24,10 @@ public class Controller implements CS355Controller
 	private ControllerState currentState = ControllerState.FREE;
 	private Color currentColor = Color.white;
 	private Shape currentShape = null;
+	private Shape selectedShape = null;
 	private Point startPoint = null;
-	private int triCornCount = 0;
 	private Point[] triCornArray = new Point[3];
+	private int triCornCount = 0;
 
 	// Singleton Stuff
 	private static Controller instance = null;
@@ -35,7 +35,7 @@ public class Controller implements CS355Controller
 	// Singleton Methods
 	public static Controller inst()
 	{
-		if(instance == null)
+		if (instance == null)
 		{
 			instance = new Controller();
 		}
@@ -69,8 +69,12 @@ public class Controller implements CS355Controller
 	public void colorButtonHit(Color color)
 	{
 		// this.currentState = controllerState.Color;
-		if(color != null)
+		if (color != null)
 		{
+			if (this.selectedShape != null)
+			{
+				this.selectedShape.setColor(color);
+			}
 			this.currentColor = color;
 			GUIFunctions.changeSelectedColor(this.currentColor);
 		}
@@ -111,83 +115,208 @@ public class Controller implements CS355Controller
 	{
 		this.startPoint = p;
 
-		switch(this.currentState)
+		switch (this.currentState)
 		{
-		case TRIANGLE:
-			this.triCornArray[this.triCornCount] = p;
-			this.triCornCount++;
-			if(this.triCornCount == 3)
-			{
-				this.triCornCount = 0;
-				this.currentShape = new Triangle(this.currentColor, this.triCornArray[0], this.triCornArray[1], this.triCornArray[2]);
-				Model.inst().addShape(this.currentShape);
-				this.currentShape = null;
-			}
-			break;
+			case TRIANGLE :
+				this.triCornArray[this.triCornCount] = p;
+				this.triCornCount++;
+				if (this.triCornCount == 3)
+				{
+					this.triCornCount = 0;
+					this.currentShape = new Triangle(this.currentColor, this.triCornArray[0], this.triCornArray[1], this.triCornArray[2]);
+					Model.inst().addShape(this.currentShape);
+					this.currentShape = null;
+				}
+				break;
 
-		case SQUARE:
-			break;
+			case SQUARE :
+				break;
 
-		case RECTANGLE:
-			break;
+			case RECTANGLE :
+				break;
 
-		case CIRCLE:
-			break;
+			case CIRCLE :
+				break;
 
-		case ELLIPSE:
-			break;
+			case ELLIPSE :
+				break;
 
-		case LINE:
-			break;
+			case LINE :
+				break;
 
-		case SELECT:
-			break;
+			case SELECT :
+				this.selectShape(p);
+				break;
 
-		case FREE:
-			break;
+			case FREE :
+				break;
 
-		default:
+			default :
 
 		}
 
 		GUIFunctions.refresh();
 	}
 
+	public void selectShape(Point p)
+	{
+		Shape temp = null;
+		for (int i = Model.inst().size() - 1; i >= 0; --i)
+		{
+			temp = Model.inst().getShape(i);
+			if (this.containsPoint(temp, p))
+			{
+				this.selectedShape = temp;
+				break;
+			}
+
+			if (i == 0)
+			{
+				temp = null;
+				this.selectedShape = null;
+			}
+		}
+
+		if (temp != null)
+		{
+			this.currentColor = temp.getColor();
+			GUIFunctions.changeSelectedColor(this.currentColor);
+		}
+	}
+
+	public Shape getSelectedShape()
+	{
+		return this.selectedShape;
+	}
+
+	public boolean containsPoint(Shape shape, Point p)
+	{
+		boolean response = false;
+
+		if (shape instanceof Line)
+		{
+			Line temp = (Line) shape;
+			boolean passedDistanceTest = this.lineDistanceTest(temp, p);
+			boolean passedSegmentPointTest = this.lineSegmentPointTest(temp, p);
+
+			System.out.println("passedDistanceTest: " + passedDistanceTest);
+			System.out.println("passedSegmentPointTest: " + passedSegmentPointTest);
+
+			return (passedDistanceTest && passedSegmentPointTest);
+
+		}
+		else if (shape instanceof Rectangle)
+		{
+			Rectangle temp = (Rectangle) shape;
+			if ((p.x < temp.getOffset().x + temp.getHalfWidth()) && (p.x > temp.getOffset().x - temp.getHalfWidth())
+					&& (p.y < temp.getOffset().y + temp.getHalfHeight()) && (p.y > temp.getOffset().y - temp.getHalfHeight()))
+			{
+				response = true;
+			}
+		}
+		else if (shape instanceof Ellipse)
+		{
+			Ellipse temp = (Ellipse) shape;
+
+			if ((Math.abs(p.x - temp.getOffset().x) <= temp.getHalfWidth()) && (Math.abs(p.y - temp.getOffset().y) <= temp.getHalfHeight()))
+				if (Math.pow((p.x - temp.getOffset().x) / (double) temp.getHalfWidth(), 2)
+						+ Math.pow((p.y - temp.getOffset().y) / (double) temp.getHalfHeight(), 2) <= 1)
+				{
+					response = true;
+				}
+		}
+		else if (shape instanceof Triangle)
+		{
+			Triangle temp = (Triangle) shape;
+			Point convertedPoint = new Point(p.x - temp.getOffset().x, p.y - temp.getOffset().y);
+
+			double inAB = ((convertedPoint.x - temp.getPointA().x) * (temp.getPointB().y - temp.getPointA().y) - (convertedPoint.y - temp.getPointA().y)
+					* (temp.getPointB().x - temp.getPointA().x));
+			double inBC = ((convertedPoint.x - temp.getPointB().x) * (temp.getPointC().y - temp.getPointB().y) - (convertedPoint.y - temp.getPointB().y)
+					* (temp.getPointC().x - temp.getPointB().x));
+			double inCA = ((convertedPoint.x - temp.getPointC().x) * (temp.getPointA().y - temp.getPointC().y) - (convertedPoint.y - temp.getPointC().y)
+					* (temp.getPointA().x - temp.getPointC().x));
+
+			if (((inAB >= 0) && (inBC >= 0) && (inCA >= 0)) || ((inAB <= 0) && (inBC <= 0) && (inCA <= 0)))
+			{
+				response = true;
+			}
+
+		}
+
+		return response;
+	}
+	public boolean lineSegmentPointTest(Line line, Point p)
+	{
+		boolean response = false;
+		double vX = p.x - line.getStart().x;
+		double vY = p.y - line.getStart().y;
+		double abSqrt = Math.sqrt(Math.pow((line.getEnd().x - line.getStart().x), 2) + Math.pow((line.getEnd().y - line.getStart().y), 2));
+		double dHatX = (line.getEnd().x - line.getStart().x) / abSqrt;
+		double dHatY = (line.getEnd().y - line.getStart().y) / abSqrt;
+		double d = ((vX * dHatX) + (vY * dHatY)) / abSqrt;
+
+		System.out.println("abSqrt was: " + abSqrt);
+		System.out.println("d was: " + d);
+
+		if ((0 <= d) && (d <= abSqrt))
+		{
+			response = true;
+			System.out.println("Passed line segment Point test?");
+		}
+
+		return response;
+	}
+
+	public boolean lineDistanceTest(Line line, Point p)
+	{
+		boolean response = true;
+		double dist = Math.abs(((line.getEnd().x - line.getStart().x) * (line.getStart().y - p.y))
+				- ((line.getStart().x - p.x) * (line.getEnd().y - line.getStart().y)))
+				/ Math.sqrt(Math.pow((line.getEnd().x - line.getStart().x), 2) + Math.pow((line.getEnd().y - line.getStart().y), 2));
+
+		if (dist > 4.0)
+		{
+			response = false;
+		}
+
+		return response;
+	}
 	public void processDragged(Point p)
 	{
-		switch(this.currentState)
+		switch (this.currentState)
 		{
-		case TRIANGLE:
-			break;
+			case TRIANGLE :
+				break;
 
-		case SQUARE:
-			this.updateSquare(p);
-			break;
+			case SQUARE :
+				this.updateSquare(p);
+				break;
 
-		case RECTANGLE:
-			updateRectangle(p);
-			break;
+			case RECTANGLE :
+				updateRectangle(p);
+				break;
 
-		case CIRCLE:
-			this.updateCircle(p);
-			break;
+			case CIRCLE :
+				this.updateCircle(p);
+				break;
 
-		case ELLIPSE:
-			this.updateEllipse(p);
-			break;
+			case ELLIPSE :
+				this.updateEllipse(p);
+				break;
 
-		case LINE:
-			((Line) this.currentShape).setEnd(p);
+			case LINE :
+				((Line) this.currentShape).setEnd(p);
 
-			break;
+				break;
 
-		case SELECT:
-			break;
+			case SELECT :
+				break;
 
-		case FREE:
-			break;
+			case FREE :
+				break;
 
-		default:
+			default :
 
 		}
 
@@ -198,72 +327,101 @@ public class Controller implements CS355Controller
 	{
 		int deltaY = Math.abs(this.startPoint.y - p.y);
 		int deltaX = Math.abs(this.startPoint.x - p.x);
+		int diameter = (deltaX > deltaY) ? deltaY : deltaX;
+		double radius = diameter / 2;
 
 		Circle circle = (Circle) currentShape;
+		circle.setRadius((int) radius);
 
-		int diameter = (deltaX > deltaY) ? deltaY : deltaX;
-		int radius = diameter / 2;
-
-		if(this.startPoint.x > p.x)
-			if(this.startPoint.y > p.y) // new point is to the upper left of start point
-				circle.setCenter(new Point(this.startPoint.x - radius, this.startPoint.y - radius));
+		if (this.startPoint.x > p.x)
+			if (this.startPoint.y > p.y) // new point is to the upper left of start point
+			{
+				circle.setOffset(new Point(this.startPoint.x - (int) radius, this.startPoint.y - (int) radius));
+			}
 			else
-				// new point is to the lower left of start point
-				circle.setCenter(new Point(this.startPoint.x - radius, this.startPoint.y + radius));
-
+			// new point is to the lower left of start point
+			{
+				circle.setOffset(new Point(this.startPoint.x - (int) radius, this.startPoint.y + (int) radius));
+			}
 		else
 		{
-			if(this.startPoint.y > p.y) // new point is to upper right of start point
-				circle.setCenter(new Point(this.startPoint.x + radius, this.startPoint.y - radius));
+			if (this.startPoint.y > p.y) // new point is to upper right of start point
+			{
+				circle.setOffset(new Point(this.startPoint.x + (int) radius, this.startPoint.y - (int) radius));
+			}
 			else
-				circle.setCenter(new Point(this.startPoint.x + radius, this.startPoint.y + radius));
+			// new point is to the lower right of the start point
+			{
+				circle.setOffset(new Point(this.startPoint.x + (int) radius, this.startPoint.y + (int) radius));
+			}
 		}
-
-		circle.setRadius(radius);
-
 	}
 
 	public void updateEllipse(Point p)
 	{
-		int height = Math.abs(this.startPoint.y - p.y);
-		int width = Math.abs(this.startPoint.x - p.x);
+		double halfHeight = Math.abs((this.startPoint.y - p.y)) / 2;
+		double halfWidth = Math.abs((this.startPoint.x - p.x)) / 2;
 		Ellipse ellipse = (Ellipse) currentShape;
-		ellipse.setHeight(height);
-		ellipse.setWidth(width);
+		ellipse.setHalfHeight((int) halfHeight);
+		ellipse.setHalfWidth((int) halfWidth);
 
-		if(this.startPoint.x > p.x)
-			if(this.startPoint.y > p.y) // new point is to the upper left of start point
-				ellipse.setCenter(new Point(p.x + width / 2, p.y + height / 2));
+		if (this.startPoint.x > p.x)
+			if (this.startPoint.y > p.y) // new point is to the upper left of start point
+			{
+				ellipse.setOffset(new Point(this.startPoint.x - (int) halfWidth, this.startPoint.y - (int) halfHeight));
+			}
 			else
-				// new point is to the lower left of start point
-				ellipse.setCenter(new Point(p.x + width / 2, this.startPoint.y + height / 2));
+			// new point is to the lower left of start point
+			{
+				ellipse.setOffset(new Point(this.startPoint.x - (int) halfWidth, this.startPoint.y + (int) halfHeight));
+			}
 
 		else
 		{
-			if(this.startPoint.y > p.y) // new point is to upper right of start point
-				ellipse.setCenter(new Point(this.startPoint.x + width / 2, p.y + height / 2));
+			if (this.startPoint.y > p.y) // new point is to upper right of start point
+			{
+				ellipse.setOffset(new Point(this.startPoint.x + (int) halfWidth, this.startPoint.y - (int) halfHeight));
+			}
 			else
-				ellipse.setCenter(new Point(this.startPoint.x + width / 2, this.startPoint.y + height / 2));
+			// new point is to the lower right of the start point
+			{
+				ellipse.setOffset(new Point(this.startPoint.x + (int) halfWidth, this.startPoint.y + (int) halfHeight));
+			}
 		}
-
 	}
 
 	public void updateRectangle(Point p)
 	{
+		double halfHeight = Math.abs((this.startPoint.y - p.y)) / 2;
+		double halfWidth = Math.abs((this.startPoint.x - p.x)) / 2;
 		Rectangle rectangle = (Rectangle) currentShape;
-		rectangle.setHeight(Math.abs(this.startPoint.y - p.y));
-		rectangle.setWidth(Math.abs(this.startPoint.x - p.x));
+		rectangle.setHalfHeight((int) halfHeight);
+		rectangle.setHalfWidth((int) halfWidth);
 
-		if(this.startPoint.x > p.x)
-			if(this.startPoint.y > p.y) // new point is to the upper left of start point
-				rectangle.setUpperLeftCorner(p);
+		if (this.startPoint.x > p.x)
+		{
+			if (this.startPoint.y > p.y) // new point is to the upper left of start point
+			{
+				rectangle.setOffset(new Point(this.startPoint.x - (int) halfWidth, this.startPoint.y - (int) halfHeight));
+			}
 			else
-				// new point is to the lower left of start point
-				rectangle.setUpperLeftCorner(new Point(p.x, this.startPoint.y));
-
-		else if(this.startPoint.y > p.y) // new point is to upper right of start point
-			rectangle.setUpperLeftCorner(new Point(this.startPoint.x, p.y));
-
+			// new point is to the lower left of start point
+			{
+				rectangle.setOffset(new Point(this.startPoint.x - (int) halfWidth, this.startPoint.y + (int) halfHeight));
+			}
+		}
+		else
+		{
+			if (this.startPoint.y > p.y) // new point is to upper right of start point
+			{
+				rectangle.setOffset(new Point(this.startPoint.x + (int) halfWidth, this.startPoint.y - (int) halfHeight));
+			}
+			else
+			// new point is to the lower right of start point
+			{
+				rectangle.setOffset(new Point(this.startPoint.x + (int) halfWidth, this.startPoint.y + (int) halfHeight));
+			}
+		}
 	}
 
 	public void updateSquare(Point p)
@@ -271,64 +429,75 @@ public class Controller implements CS355Controller
 		int deltaY = Math.abs(this.startPoint.y - p.y);
 		int deltaX = Math.abs(this.startPoint.x - p.x);
 		int side = (deltaX > deltaY) ? deltaY : deltaX;
-
+		double halfSide = side / 2;
 		Square square = (Square) currentShape;
+		square.setHalfSize((int) halfSide);
 
-		if(this.startPoint.x > p.x)
-			if(this.startPoint.y > p.y) // new point is to the upper left of start point
-				square.setUpperLeftCorner(new Point(this.startPoint.x - side, this.startPoint.y - side));
+		if (this.startPoint.x > p.x)
+		{
+			if (this.startPoint.y > p.y) // new point is to the upper left of start point
+			{
+				square.setOffset(new Point(this.startPoint.x - (int) halfSide, this.startPoint.y - (int) halfSide));
+			}
 			else
-				// new point is to the lower left of start point
-				square.setUpperLeftCorner(new Point(this.startPoint.x - side, this.startPoint.y));
-		else if(this.startPoint.y > p.y) // new point is to upper right of start point
-			square.setUpperLeftCorner(new Point(this.startPoint.x, this.startPoint.y - side));
-
-		square.setSideLength(side);
+			// new point is to the lower left of start point
+			{
+				square.setOffset(new Point(this.startPoint.x - (int) halfSide, this.startPoint.y + (int) halfSide));
+			}
+		}
+		else
+		{
+			if (this.startPoint.y > p.y) // new point is to upper right of start point
+			{
+				square.setOffset(new Point(this.startPoint.x + (int) halfSide, this.startPoint.y - (int) halfSide));
+			}
+			else
+			{
+				square.setOffset(new Point(this.startPoint.x + (int) halfSide, this.startPoint.y + (int) halfSide));
+			}
+		}
 	}
 
 	public void processPressed(Point p)
 	{
 		this.startPoint = p;
 
-		switch(this.currentState)
+		switch (this.currentState)
 		{
-		case TRIANGLE:
-			break;
+			case TRIANGLE :
+				return;
 
-		case SQUARE:
-			this.currentShape = new Square(this.currentColor, p, 0);
-			break;
+			case SQUARE :
+				this.currentShape = new Square(this.currentColor, p, 0);
+				break;
 
-		case RECTANGLE:
-			this.currentShape = new Rectangle(this.currentColor, p, 0, 0);
-			break;
+			case RECTANGLE :
+				this.currentShape = new Rectangle(this.currentColor, p, 0, 0);
+				break;
 
-		case CIRCLE:
-			this.currentShape = new Circle(this.currentColor, p, 0);
-			break;
+			case CIRCLE :
+				this.currentShape = new Circle(this.currentColor, p, 0);
+				break;
 
-		case ELLIPSE:
-			this.currentShape = new Ellipse(this.currentColor, p, 0, 0);
-			break;
+			case ELLIPSE :
+				this.currentShape = new Ellipse(this.currentColor, p, 0, 0);
+				break;
 
-		case LINE:
-			this.currentShape = new Line(this.currentColor, p, p);
-			break;
+			case LINE :
+				this.currentShape = new Line(this.currentColor, p, p);
+				break;
 
-		case SELECT:
-			break;
+			case SELECT :
+				return;
 
-		case FREE:
-			break;
+			case FREE :
+				return;
 
-		default:
+			default :
 
 		}
 
-		if(this.currentState != ControllerState.TRIANGLE)
-		{
-			Model.inst().addShape(this.currentShape);
-		}
+		Model.inst().addShape(this.currentShape);
 		GUIFunctions.refresh();
 	}
 
@@ -348,7 +517,9 @@ public class Controller implements CS355Controller
 	private void resetState()
 	{
 		this.currentShape = null;
+		this.selectedShape = null;
 		this.currentState = ControllerState.FREE;
+		GUIFunctions.refresh();
 	}
 
 	@Override

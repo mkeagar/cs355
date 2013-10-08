@@ -1,4 +1,3 @@
-
 package cs355.model;
 
 import java.awt.Color;
@@ -7,9 +6,9 @@ import java.awt.Point;
 public abstract class Shape
 {
 	// Variables
-	private Color color;
-	private double theta;
-	private Point offset;
+	private Color color;	// R, G, B, and Alpha channels
+	private double theta;	// in Radians
+	private Point offset;	// location in world coordinates
 
 	// Constructor
 	public Shape(Color col)
@@ -37,7 +36,8 @@ public abstract class Shape
 
 	public void setRotation(double theta)
 	{
-		this.theta = theta;
+
+		this.theta = theta % (2 * Math.PI);
 	}
 
 	public Point getOffset()

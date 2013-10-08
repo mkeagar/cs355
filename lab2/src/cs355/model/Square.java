@@ -1,4 +1,3 @@
-
 package cs355.model;
 
 import java.awt.Color;
@@ -7,31 +6,36 @@ import java.awt.Point;
 public class Square extends Rectangle
 {
 	// Variables
-	private int sideLength = 0;
+	private int halfSize = 0;
 
 	// Constructor
-	public Square(Color col, Point p, int s)
+	public Square(Color col, Point p, int hs)
 	{
-		super(col, p, s, s);
-		this.sideLength = s;
+		super(col, p, hs, hs);
+		this.halfSize = hs;
 	}
 
 	// Methods
-	public int getSideLength()
+	public int getHalfSize()
 	{
-		return this.sideLength;
+		return this.halfSize;
 	}
 
-	public void setSideLength(int s)
+	public void setHalfSize(int hs)
 	{
-		this.sideLength = s;
-		super.setHeight(this.sideLength);
-		super.setWidth(this.sideLength);
+		this.halfSize = hs;
+		super.setHalfHeight(this.halfSize);
+		super.setHalfWidth(this.halfSize);
+	}
+
+	public int getSize()
+	{
+		return (this.halfSize * 2);
 	}
 
 	@Override
 	public String toString()
 	{
-		return "Square [sideLength=" + sideLength + "]";
+		return "Square [halfSize=" + halfSize + "]";
 	}
 }

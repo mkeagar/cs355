@@ -1,4 +1,3 @@
-
 package cs355.model;
 
 import java.awt.Color;
@@ -7,53 +6,59 @@ import java.awt.Point;
 public class Ellipse extends Shape
 {
 	// Variables
-	private Point center = null;
-	private int height = 0;
-	private int width = 0;
+	private int halfHeight = 0;
+	private int halfWidth = 0;
 
 	// Constructor
-	public Ellipse(Color color, Point center, int height, int width)
+	public Ellipse(Color color, Point p, int hh, int hw)
 	{
 		super(color);
-		this.center = center;
-		this.height = height;
-		this.width = width;
+		super.setOffset(p);
+		this.halfHeight = hh;
+		this.halfWidth = hw;
 	}
 
-	public Point getCenter()
+	// Methods
+
+	public Point getUpperLeftCorner()
 	{
-		return this.center;
+		return new Point(-this.halfWidth, -this.halfHeight);
+	}
+
+	public int getHalfHeight()
+	{
+		return this.halfHeight;
 	}
 
 	public int getHeight()
 	{
-		return this.height;
+		return (this.halfHeight * 2);
+	}
+
+	public void setHalfHeight(int hh)
+	{
+		this.halfHeight = hh;
+	}
+
+	public int getHalfWidth()
+	{
+		return this.halfWidth;
 	}
 
 	public int getWidth()
 	{
-		return this.width;
+		return (this.halfWidth * 2);
 	}
 
-	public void setCenter(Point center)
+	public void setHalfWidth(int hw)
 	{
-		this.center = center;
-	}
-
-	public void setHeight(int height)
-	{
-		this.height = height;
-	}
-
-	public void setWidth(int width)
-	{
-		this.width = width;
+		this.halfWidth = hw;
 	}
 
 	@Override
 	public String toString()
 	{
-		return "Ellipse [center=" + center + ", height=" + height + ", width=" + width + "]";
+		return "Ellipse [height=" + halfHeight + ", width=" + halfWidth + "]";
 	}
 
 }
