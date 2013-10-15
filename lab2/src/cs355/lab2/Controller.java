@@ -26,7 +26,11 @@ public class Controller implements CS355Controller
 	private Shape currentShape = null;
 	private Shape selectedShape = null;
 	private Point startPoint = null;
+	private Point lastDragPoint = null;
 	private Point[] triCornArray = new Point[3];
+	private Point selectedHandle = null;
+	private boolean pressedResizeHandle = false;
+	private boolean pressedRotateHandle = false;
 	private int triCornCount = 0;
 
 	// Singleton Stuff
@@ -47,6 +51,8 @@ public class Controller implements CS355Controller
 	{
 		// Exists only to defeat instantiation
 	}
+
+	// Methods
 
 	public void setMouseButtonState(MouseButtonState mbs)
 	{
@@ -78,6 +84,8 @@ public class Controller implements CS355Controller
 			this.currentColor = color;
 			GUIFunctions.changeSelectedColor(this.currentColor);
 		}
+
+		GUIFunctions.refresh();
 	}
 
 	@Override
@@ -145,7 +153,6 @@ public class Controller implements CS355Controller
 				break;
 
 			case SELECT :
-				this.selectShape(p);
 				break;
 
 			case FREE :
@@ -192,6 +199,7 @@ public class Controller implements CS355Controller
 	public boolean containsPoint(Shape shape, Point p)
 	{
 		boolean response = false;
+		Point convertedPoint = worldToObject(p, shape);
 
 		if (shape instanceof Line)
 		{
@@ -199,43 +207,39 @@ public class Controller implements CS355Controller
 			boolean passedDistanceTest = this.lineDistanceTest(temp, p);
 			boolean passedSegmentPointTest = this.lineSegmentPointTest(temp, p);
 
-			System.out.println("passedDistanceTest: " + passedDistanceTest);
-			System.out.println("passedSegmentPointTest: " + passedSegmentPointTest);
-
 			return (passedDistanceTest && passedSegmentPointTest);
 
 		}
 		else if (shape instanceof Rectangle)
 		{
-			Rectangle temp = (Rectangle) shape;
-			if ((p.x < temp.getOffset().x + temp.getHalfWidth()) && (p.x > temp.getOffset().x - temp.getHalfWidth())
-					&& (p.y < temp.getOffset().y + temp.getHalfHeight()) && (p.y > temp.getOffset().y - temp.getHalfHeight()))
+			Rectangle rectangle = (Rectangle) shape;
+			if ((convertedPoint.x < rectangle.getHalfWidth()) && (convertedPoint.x > -rectangle.getHalfWidth())
+					&& (convertedPoint.y < rectangle.getHalfHeight()) && (convertedPoint.y > -rectangle.getHalfHeight()))
 			{
 				response = true;
 			}
 		}
 		else if (shape instanceof Ellipse)
 		{
-			Ellipse temp = (Ellipse) shape;
+			Ellipse ellipse = (Ellipse) shape;
 
-			if ((Math.abs(p.x - temp.getOffset().x) <= temp.getHalfWidth()) && (Math.abs(p.y - temp.getOffset().y) <= temp.getHalfHeight()))
-				if (Math.pow((p.x - temp.getOffset().x) / (double) temp.getHalfWidth(), 2)
-						+ Math.pow((p.y - temp.getOffset().y) / (double) temp.getHalfHeight(), 2) <= 1)
+			if ((convertedPoint.x <= ellipse.getHalfWidth()) && (convertedPoint.y <= ellipse.getHalfHeight()))
+				if (Math.pow(convertedPoint.x / (double) ellipse.getHalfWidth(), 2)
+						+ Math.pow(convertedPoint.y / (double) ellipse.getHalfHeight(), 2) <= 1)
 				{
 					response = true;
 				}
 		}
 		else if (shape instanceof Triangle)
 		{
-			Triangle temp = (Triangle) shape;
-			Point convertedPoint = new Point(p.x - temp.getOffset().x, p.y - temp.getOffset().y);
+			Triangle triangle = (Triangle) shape;
 
-			double inAB = ((convertedPoint.x - temp.getPointA().x) * (temp.getPointB().y - temp.getPointA().y) - (convertedPoint.y - temp.getPointA().y)
-					* (temp.getPointB().x - temp.getPointA().x));
-			double inBC = ((convertedPoint.x - temp.getPointB().x) * (temp.getPointC().y - temp.getPointB().y) - (convertedPoint.y - temp.getPointB().y)
-					* (temp.getPointC().x - temp.getPointB().x));
-			double inCA = ((convertedPoint.x - temp.getPointC().x) * (temp.getPointA().y - temp.getPointC().y) - (convertedPoint.y - temp.getPointC().y)
-					* (temp.getPointA().x - temp.getPointC().x));
+			double inAB = ((convertedPoint.x - triangle.getPointA().x) * (triangle.getPointB().y - triangle.getPointA().y) - (convertedPoint.y - triangle
+					.getPointA().y) * (triangle.getPointB().x - triangle.getPointA().x));
+			double inBC = ((convertedPoint.x - triangle.getPointB().x) * (triangle.getPointC().y - triangle.getPointB().y) - (convertedPoint.y - triangle
+					.getPointB().y) * (triangle.getPointC().x - triangle.getPointB().x));
+			double inCA = ((convertedPoint.x - triangle.getPointC().x) * (triangle.getPointA().y - triangle.getPointC().y) - (convertedPoint.y - triangle
+					.getPointC().y) * (triangle.getPointA().x - triangle.getPointC().x));
 
 			if (((inAB >= 0) && (inBC >= 0) && (inCA >= 0)) || ((inAB <= 0) && (inBC <= 0) && (inCA <= 0)))
 			{
@@ -246,6 +250,7 @@ public class Controller implements CS355Controller
 
 		return response;
 	}
+
 	public boolean lineSegmentPointTest(Line line, Point p)
 	{
 		boolean response = false;
@@ -256,15 +261,10 @@ public class Controller implements CS355Controller
 		double dHatY = (line.getEnd().y - line.getStart().y) / abSqrt;
 		double d = ((vX * dHatX) + (vY * dHatY)) / abSqrt;
 
-		System.out.println("abSqrt was: " + abSqrt);
-		System.out.println("d was: " + d);
-
 		if ((0 <= d) && (d <= abSqrt))
 		{
 			response = true;
-			System.out.println("Passed line segment Point test?");
 		}
-
 		return response;
 	}
 
@@ -282,6 +282,7 @@ public class Controller implements CS355Controller
 
 		return response;
 	}
+
 	public void processDragged(Point p)
 	{
 		switch (this.currentState)
@@ -311,6 +312,103 @@ public class Controller implements CS355Controller
 				break;
 
 			case SELECT :
+				if (this.selectedShape == null) break;
+				if (pressedResizeHandle)
+				{
+					if (this.selectedShape instanceof Line)
+					{
+						((Line) this.selectedShape).setEnd(p);
+					}
+					else if (this.selectedShape instanceof Rectangle)
+					{
+						this.currentShape = this.selectedShape;
+						if (this.selectedShape instanceof Square)
+						{
+							this.updateSquare(p);
+							break;
+						}
+						this.updateRectangle(p);
+					}
+					else if (this.selectedShape instanceof Ellipse)
+					{
+						this.currentShape = this.selectedShape;
+						if (this.selectedShape instanceof Circle)
+						{
+							this.updateCircle(p);
+							break;
+						}
+						this.updateEllipse(p);
+					}
+					else if (this.selectedShape instanceof Triangle)
+					{
+						Triangle triangle = (Triangle) this.selectedShape;
+
+						Point op = this.worldToObject(p, triangle);
+
+						this.selectedHandle.x = op.x;
+						this.selectedHandle.y = op.y;
+
+						Point aWorld = objectToWorld(triangle.getPointA(), triangle);
+						Point bWorld = objectToWorld(triangle.getPointB(), triangle);
+						Point cWorld = objectToWorld(triangle.getPointC(), triangle);
+
+						double newXOffset = (aWorld.x + bWorld.x + cWorld.x) / 3.0;
+						double newYOffset = (aWorld.y + bWorld.y + cWorld.y) / 3.0;
+
+						Point newOffset = new Point((int) newXOffset, (int) newYOffset);
+						triangle.setOffset(newOffset);
+
+						if (this.selectedHandle != triangle.getPointA())
+						{
+							triangle.setPointA(this.worldToObject(aWorld, triangle));
+						}
+						if (this.selectedHandle != triangle.getPointB())
+						{
+							triangle.setPointB(this.worldToObject(bWorld, triangle));
+						}
+						if (this.selectedHandle != triangle.getPointC())
+						{
+							triangle.setPointC(this.worldToObject(cWorld, triangle));
+						}
+					}
+				}
+				else if (pressedRotateHandle)
+				{
+					if (this.selectedShape instanceof Rectangle)
+					{
+						Rectangle rectangle = (Rectangle) this.selectedShape;
+
+						int deltaX = rectangle.getXOffset() - p.x;
+						int deltaY = rectangle.getYOffset() - p.y;
+
+						double theta = Math.atan2(deltaY, deltaX) - Math.PI / 2;
+						rectangle.setRotation(theta);
+					}
+					else if (this.selectedShape instanceof Ellipse)
+					{
+						Ellipse ellipse = (Ellipse) this.selectedShape;
+
+						int deltaX = ellipse.getXOffset() - p.x;
+						int deltaY = ellipse.getYOffset() - p.y;
+
+						double theta = Math.atan2(deltaY, deltaX) - Math.PI / 2;
+						ellipse.setRotation(theta);
+					}
+					else if (this.selectedShape instanceof Triangle)
+					{
+						Triangle triangle = (Triangle) this.selectedShape;
+
+						int deltaX = triangle.getXOffset() - p.x;
+						int deltaY = triangle.getYOffset() - p.y;
+
+						double theta = Math.atan2(deltaY, deltaX) - Math.PI / 2;
+						triangle.setRotation(theta);
+					}
+				}
+				else
+				{
+					this.updateOffset(this.selectedShape, p);
+				}
 				break;
 
 			case FREE :
@@ -321,6 +419,24 @@ public class Controller implements CS355Controller
 		}
 
 		GUIFunctions.refresh();
+	}
+
+	public void updateOffset(Shape shape, Point p)
+	{
+		int deltaX = p.x - this.lastDragPoint.x;
+		int deltaY = p.y - this.lastDragPoint.y;
+
+		if (shape instanceof Line)
+		{
+			Line line = (Line) shape;
+			line.setStart(new Point(line.getStart().x + deltaX, line.getStart().y + deltaY));
+			line.setEnd(new Point(line.getEnd().x + deltaX, line.getEnd().y + deltaY));
+		}
+		else
+		{
+			shape.setOffset(new Point(shape.getOffset().x + deltaX, shape.getOffset().y + deltaY));
+		}
+		this.lastDragPoint = p;
 	}
 
 	public void updateCircle(Point p)
@@ -488,6 +604,32 @@ public class Controller implements CS355Controller
 				break;
 
 			case SELECT :
+				if (this.selectedShape != null)
+				{
+					if (this.pressedResizeHandle(p))
+					{
+						System.out.println("Pressed Resize Handle");
+						this.pressedResizeHandle = true;
+						this.pressedRotateHandle = false;
+						this.setHandleAnchor(p);
+						return;
+					}
+					else if (this.pressedRotateHandle(p))
+					{
+						System.out.println("Pressed Rotate Handle");
+						this.pressedResizeHandle = false;
+						this.pressedRotateHandle = true;
+						this.startPoint = p;
+						return;
+					}
+					else
+					{
+						this.pressedResizeHandle = false;
+						this.pressedRotateHandle = false;
+					}
+				}
+				this.lastDragPoint = p;
+				this.selectShape(p);
 				return;
 
 			case FREE :
@@ -499,6 +641,216 @@ public class Controller implements CS355Controller
 
 		Model.inst().addShape(this.currentShape);
 		GUIFunctions.refresh();
+	}
+
+	public void setHandleAnchor(Point p)
+	{
+		Point convertedPoint = worldToObject(p, this.selectedShape);
+
+		if (this.selectedShape instanceof Line)
+		{
+			Line line = (Line) this.selectedShape;
+			if (line.getStart().distance(p) <= View.HANDLE_RADIUS)
+			{
+				Point temp = line.getStart();
+				line.setStart(line.getEnd());
+				line.setEnd(temp);
+			}
+		}
+		else if (this.selectedShape instanceof Rectangle)
+		{
+			Rectangle rectangle = (Rectangle) this.selectedShape;
+			int hh = rectangle.getHalfHeight();
+			int hw = rectangle.getHalfWidth();
+			int xOff = rectangle.getXOffset();
+			int yOff = rectangle.getYOffset();
+
+			Point upLeft = new Point(xOff - hw, yOff - hh);
+			Point upRight = new Point(xOff + hw, yOff - hh);
+			Point lowLeft = new Point(xOff - hw, yOff + hh);
+			Point lowRight = new Point(xOff + hw, yOff + hh);
+
+			if (p.distance(upLeft) <= View.HANDLE_RADIUS)
+			{
+				this.startPoint = lowRight;
+			}
+			else if (p.distance(upRight) <= View.HANDLE_RADIUS)
+			{
+				this.startPoint = lowLeft;
+			}
+			else if (p.distance(lowLeft) <= View.HANDLE_RADIUS)
+			{
+				this.startPoint = upRight;
+			}
+			else if (p.distance(lowRight) <= View.HANDLE_RADIUS)
+			{
+				this.startPoint = upLeft;
+			}
+
+		}
+		else if (this.selectedShape instanceof Ellipse)
+		{
+			Ellipse ellipse = (Ellipse) this.selectedShape;
+			int hh = ellipse.getHalfHeight();
+			int hw = ellipse.getHalfWidth();
+			int xOff = ellipse.getXOffset();
+			int yOff = ellipse.getYOffset();
+
+			Point upLeft = new Point(xOff - hw, yOff - hh);
+			Point upRight = new Point(xOff + hw, yOff - hh);
+			Point lowLeft = new Point(xOff - hw, yOff + hh);
+			Point lowRight = new Point(xOff + hw, yOff + hh);
+
+			if (p.distance(upLeft) <= View.HANDLE_RADIUS)
+			{
+				this.startPoint = lowRight;
+			}
+			else if (p.distance(upRight) <= View.HANDLE_RADIUS)
+			{
+				this.startPoint = lowLeft;
+			}
+			else if (p.distance(lowLeft) <= View.HANDLE_RADIUS)
+			{
+				this.startPoint = upRight;
+			}
+			else if (p.distance(lowRight) <= View.HANDLE_RADIUS)
+			{
+				this.startPoint = upLeft;
+			}
+		}
+		else if (this.selectedShape instanceof Triangle)
+		{
+			Triangle triangle = (Triangle) this.selectedShape;
+
+			if (convertedPoint.distance(triangle.getPointA()) <= View.HANDLE_RADIUS)
+			{
+				this.selectedHandle = triangle.getPointA();
+			}
+			else if (convertedPoint.distance(triangle.getPointB()) <= View.HANDLE_RADIUS)
+			{
+				this.selectedHandle = triangle.getPointB();
+			}
+			else if (convertedPoint.distance(triangle.getPointC()) <= View.HANDLE_RADIUS)
+			{
+				this.selectedHandle = triangle.getPointC();
+			}
+		}
+	}
+
+	public boolean pressedRotateHandle(Point p)  // Doesn't work properly yet. Too tired to work on it any longer.
+	{
+		boolean response = false;
+		Point convertedPoint = this.worldToObject(p, this.selectedShape);
+
+		if (this.selectedShape instanceof Rectangle)
+		{
+			Rectangle rectangle = (Rectangle) this.selectedShape;
+
+			if ((convertedPoint.distance(new Point(0, View.HANDLE_RADIUS - rectangle.getHalfHeight() - View.ROTATION_HANDLE_Y_OFFSET)) <= View.HANDLE_RADIUS))
+			{
+				response = true;
+			}
+		}
+		else if (this.selectedShape instanceof Ellipse)
+		{
+			Ellipse ellipse = (Ellipse) this.selectedShape;
+			if ((convertedPoint.distance(new Point(0, View.HANDLE_RADIUS - ellipse.getHalfHeight() - View.ROTATION_HANDLE_Y_OFFSET)) <= View.HANDLE_RADIUS))
+			{
+				response = true;
+			}
+		}
+		else if (this.selectedShape instanceof Triangle)
+		{
+			Triangle triangle = (Triangle) this.selectedShape;
+			int highestY = Math.max(Math.abs(triangle.getPointA().y), Math.max(Math.abs(triangle.getPointB().y), Math.abs(triangle.getPointC().y)));
+
+			if ((convertedPoint.distance(new Point(0, View.HANDLE_RADIUS - highestY - View.ROTATION_HANDLE_Y_OFFSET)) <= View.HANDLE_RADIUS))
+			{
+				response = true;
+			}
+		}
+		return response;
+	}
+
+	public boolean pressedResizeHandle(Point p)
+	{
+		boolean response = false;
+		Point convertedPoint = this.worldToObject(p, this.selectedShape);
+
+		if (this.selectedShape instanceof Line)
+		{
+			Line line = (Line) this.selectedShape;
+			if ((line.getStart().distance(p) <= View.HANDLE_RADIUS) || (line.getEnd().distance(p) <= View.HANDLE_RADIUS))
+			{
+				response = true;
+			}
+		}
+		else if (this.selectedShape instanceof Rectangle)
+		{
+			Rectangle rectangle = (Rectangle) this.selectedShape;
+
+			if ((convertedPoint.distance(new Point(rectangle.getHalfWidth(), rectangle.getHalfHeight())) < View.HANDLE_RADIUS)
+					|| (convertedPoint.distance(new Point(rectangle.getHalfWidth(), -rectangle.getHalfHeight())) <= View.HANDLE_RADIUS)
+					|| (convertedPoint.distance(new Point(-rectangle.getHalfWidth(), rectangle.getHalfHeight())) <= View.HANDLE_RADIUS)
+					|| (convertedPoint.distance(new Point(-rectangle.getHalfWidth(), -rectangle.getHalfHeight())) <= View.HANDLE_RADIUS))
+			{
+				response = true;
+			}
+
+		}
+		else if (this.selectedShape instanceof Ellipse)
+		{
+			Ellipse ellipse = (Ellipse) this.selectedShape;
+			if ((convertedPoint.distance(new Point(ellipse.getHalfWidth(), ellipse.getHalfHeight())) < View.HANDLE_RADIUS)
+					|| (convertedPoint.distance(new Point(ellipse.getHalfWidth(), -ellipse.getHalfHeight())) <= View.HANDLE_RADIUS)
+					|| (convertedPoint.distance(new Point(-ellipse.getHalfWidth(), ellipse.getHalfHeight())) <= View.HANDLE_RADIUS)
+					|| (convertedPoint.distance(new Point(-ellipse.getHalfWidth(), -ellipse.getHalfHeight())) <= View.HANDLE_RADIUS))
+			{
+				response = true;
+			}
+		}
+		else if (this.selectedShape instanceof Triangle)
+		{
+			Triangle triangle = (Triangle) this.selectedShape;
+			if ((convertedPoint.distance(triangle.getPointA()) <= View.HANDLE_RADIUS)
+					|| (convertedPoint.distance(triangle.getPointB()) <= View.HANDLE_RADIUS)
+					|| (convertedPoint.distance(triangle.getPointC()) <= View.HANDLE_RADIUS))
+			{
+				response = true;
+			}
+		}
+
+		return response;
+	}
+
+	public Point objectToWorld(Point op, Shape shape)
+	{
+		double theta = shape.getRotation();
+		double opX = op.x;
+		double opY = op.y;
+		double cX = shape.getXOffset();
+		double cY = shape.getYOffset();
+
+		double wX = Math.cos(theta) * opX - Math.sin(theta) * opY + cX;
+		double wY = Math.sin(theta) * opX + Math.cos(theta) * opY + cY;
+
+		Point wp = new Point((int) wX, (int) wY);
+		return wp;
+	}
+
+	public Point worldToObject(Point wp, Shape shape)
+	{
+		double theta = shape.getRotation();
+		double cX = shape.getXOffset();
+		double cY = shape.getYOffset();
+		double wpX = wp.x;
+		double wpY = wp.y;
+
+		double x = Math.cos(theta) * wpX + Math.sin(theta) * wpY + (-Math.cos(theta) * cX - Math.sin(theta) * cY);
+		double y = -Math.sin(theta) * wpX + Math.cos(theta) * wpY + (Math.sin(theta) * cX - Math.cos(theta) * cY);
+
+		Point op = new Point((int) x, (int) y);
+		return op;
 	}
 
 	public void processReleased(Point p)
@@ -513,7 +865,6 @@ public class Controller implements CS355Controller
 		this.currentState = ControllerState.RECTANGLE;
 	}
 
-	// Methods
 	private void resetState()
 	{
 		this.currentShape = null;
@@ -565,5 +916,4 @@ public class Controller implements CS355Controller
 		// this.resetState();
 		// this.currentState = ControllerState.ZOOM_OUT;
 	}
-
 }

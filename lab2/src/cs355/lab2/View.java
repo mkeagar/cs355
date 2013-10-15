@@ -16,10 +16,14 @@ public class View implements ViewRefresher
 	};
 	private ShapeType selectedShapeType = ShapeType.NONE;
 	private Shape selectedShape = null;
-	private final int HANDLE_OFFSET = 3;
-	private final int ROTATION_HANDLE_Y_OFFSET = 12;
-	private final int SELECT_STROKE = 3;
+	public final static int ROTATION_HANDLE_Y_OFFSET = 30;
+	private final int HANDLE_WIDTH = 10;
+	public final static int HANDLE_RADIUS = 5;
+	private final int HANDLE_OFFSET = 5;
+	private final int SELECT_STROKE = 2;
 	private Color selectColor = Color.WHITE;
+	private final Color WHITE_SELECT_COLOR = new Color(250, 50, 0);
+	private final Color ROTATION_HANDLE_COLOR = new Color(200, 25, 200);
 
 	// Singleton Stuff
 	private static View instance = null;
@@ -39,6 +43,8 @@ public class View implements ViewRefresher
 	{
 		// Exists only to defeat instantiation
 	}
+
+	// Methods
 
 	@Override
 	public void refreshView(Graphics2D g2d)
@@ -62,7 +68,6 @@ public class View implements ViewRefresher
 				if (currentShape == selectedShape)
 				{
 					this.selectColor = this.invertColor(currentShape.getColor());
-					if (line.getColor() == Color.WHITE) this.selectColor = new Color(255, 0, 0);
 					g2d.setColor(this.selectColor);
 					g2d.drawLine(line.getStart().x, line.getStart().y, line.getEnd().x, line.getEnd().y);
 					this.selectedShapeType = ShapeType.LINE;
@@ -78,7 +83,6 @@ public class View implements ViewRefresher
 				if (currentShape == selectedShape)
 				{
 					this.selectColor = this.invertColor(currentShape.getColor());
-					if (rectangle.getColor() == Color.WHITE) this.selectColor = new Color(255, 0, 0);
 					g2d.setColor(this.selectColor);
 					g2d.setStroke(new BasicStroke(SELECT_STROKE));
 					g2d.drawRect(rectangle.getUpperLeftCorner().x, rectangle.getUpperLeftCorner().y, rectangle.getWidth(), rectangle.getHeight());
@@ -97,7 +101,6 @@ public class View implements ViewRefresher
 				if (currentShape == selectedShape)
 				{
 					this.selectColor = this.invertColor(currentShape.getColor());
-					if (ellipse.getColor() == Color.WHITE) this.selectColor = new Color(255, 0, 0);
 					g2d.setColor(this.selectColor);
 					g2d.setStroke(new BasicStroke(SELECT_STROKE));
 					g2d.drawOval(ellipse.getUpperLeftCorner().x, ellipse.getUpperLeftCorner().y, ellipse.getWidth(), ellipse.getHeight());
@@ -126,7 +129,6 @@ public class View implements ViewRefresher
 				if (currentShape == selectedShape)
 				{
 					this.selectColor = this.invertColor(currentShape.getColor());
-					if (triangle.getColor() == Color.WHITE) this.selectColor = new Color(255, 0, 0);
 					g2d.setColor(this.selectColor);
 					g2d.setStroke(new BasicStroke(SELECT_STROKE));
 					g2d.drawPolygon(xArr, yArr, numPoints);
@@ -143,7 +145,6 @@ public class View implements ViewRefresher
 		if (this.selectedShape != null)
 		{
 			this.selectColor = this.invertColor(this.selectedShape.getColor());
-			if (this.selectedShape.getColor() == Color.WHITE) this.selectColor = new Color(255, 0, 0);
 			g2d.setColor(this.selectColor);
 			g2d.setStroke(new BasicStroke(SELECT_STROKE));
 			g2d.translate(this.selectedShape.getXOffset(), this.selectedShape.getYOffset());
@@ -169,38 +170,49 @@ public class View implements ViewRefresher
 
 			case LINE :
 				Line line = (Line) this.selectedShape;
-				g2d.drawOval(line.getStart().x - this.HANDLE_OFFSET, line.getStart().y - this.HANDLE_OFFSET, 6, 6);
-				g2d.drawOval(line.getEnd().x - this.HANDLE_OFFSET, line.getEnd().y - this.HANDLE_OFFSET, 6, 6);
+				g2d.drawOval(line.getStart().x - this.HANDLE_OFFSET, line.getStart().y - this.HANDLE_OFFSET, this.HANDLE_WIDTH, this.HANDLE_WIDTH);
+				g2d.drawOval(line.getEnd().x - this.HANDLE_OFFSET, line.getEnd().y - this.HANDLE_OFFSET, this.HANDLE_WIDTH, this.HANDLE_WIDTH);
 				break;
 
 			case RECTANGLE :
 				Rectangle rectangle = (Rectangle) this.selectedShape;
 				hw = rectangle.getHalfWidth();
 				hh = rectangle.getHalfHeight();
-				g2d.drawOval(-hw - this.HANDLE_OFFSET, -hh - this.HANDLE_OFFSET, 6, 6);
-				g2d.drawOval(-hw - this.HANDLE_OFFSET, hh - this.HANDLE_OFFSET, 6, 6);
-				g2d.drawOval(hw - this.HANDLE_OFFSET, -hh - this.HANDLE_OFFSET, 6, 6);
-				g2d.drawOval(hw - this.HANDLE_OFFSET, hh - this.HANDLE_OFFSET, 6, 6);
-				g2d.drawOval(-this.HANDLE_OFFSET, -hh - this.ROTATION_HANDLE_Y_OFFSET, 6, 6);
+				g2d.drawOval(-hw - this.HANDLE_OFFSET, -hh - this.HANDLE_OFFSET, this.HANDLE_WIDTH, this.HANDLE_WIDTH);
+				g2d.drawOval(-hw - this.HANDLE_OFFSET, hh - this.HANDLE_OFFSET, this.HANDLE_WIDTH, this.HANDLE_WIDTH);
+				g2d.drawOval(hw - this.HANDLE_OFFSET, -hh - this.HANDLE_OFFSET, this.HANDLE_WIDTH, this.HANDLE_WIDTH);
+				g2d.drawOval(hw - this.HANDLE_OFFSET, hh - this.HANDLE_OFFSET, this.HANDLE_WIDTH, this.HANDLE_WIDTH);
+				g2d.setColor(this.ROTATION_HANDLE_COLOR);
+				g2d.drawOval(-this.HANDLE_OFFSET, -hh - View.ROTATION_HANDLE_Y_OFFSET, this.HANDLE_WIDTH, this.HANDLE_WIDTH);
 				break;
 
 			case ELLIPSE :
 				Ellipse ellipse = (Ellipse) this.selectedShape;
 				hw = ellipse.getHalfWidth();
 				hh = ellipse.getHalfHeight();
-				g2d.drawOval(-hw - this.HANDLE_OFFSET, -hh - this.HANDLE_OFFSET, 6, 6);
-				g2d.drawOval(-hw - this.HANDLE_OFFSET, hh - this.HANDLE_OFFSET, 6, 6);
-				g2d.drawOval(hw - this.HANDLE_OFFSET, -hh - this.HANDLE_OFFSET, 6, 6);
-				g2d.drawOval(hw - this.HANDLE_OFFSET, hh - this.HANDLE_OFFSET, 6, 6);
-				if (!(this.selectedShape instanceof Circle)) g2d.drawOval(-this.HANDLE_OFFSET, -hh - this.ROTATION_HANDLE_Y_OFFSET, 6, 6);
+				g2d.drawOval(-hw - this.HANDLE_OFFSET, -hh - this.HANDLE_OFFSET, this.HANDLE_WIDTH, this.HANDLE_WIDTH);
+				g2d.drawOval(-hw - this.HANDLE_OFFSET, hh - this.HANDLE_OFFSET, this.HANDLE_WIDTH, this.HANDLE_WIDTH);
+				g2d.drawOval(hw - this.HANDLE_OFFSET, -hh - this.HANDLE_OFFSET, this.HANDLE_WIDTH, this.HANDLE_WIDTH);
+				g2d.drawOval(hw - this.HANDLE_OFFSET, hh - this.HANDLE_OFFSET, this.HANDLE_WIDTH, this.HANDLE_WIDTH);
+				if (!(this.selectedShape instanceof Circle))
+				{
+					g2d.setColor(this.ROTATION_HANDLE_COLOR);
+					g2d.drawOval(-this.HANDLE_OFFSET, -hh - View.ROTATION_HANDLE_Y_OFFSET, this.HANDLE_WIDTH, this.HANDLE_WIDTH);
+				}
 				break;
 
 			case TRIANGLE :
 				Triangle triangle = (Triangle) this.selectedShape;
-				g2d.drawOval(triangle.getOffset().x - 3, triangle.getOffset().y - 3, 6, 6);
-				g2d.drawOval(triangle.getOffset().x - 3, triangle.getOffset().y - 3, 6, 6);
-				g2d.drawOval(triangle.getOffset().x - 3, triangle.getOffset().y - 3, 6, 6);
-				g2d.drawOval(triangle.getOffset().x - 3, triangle.getOffset().y - 3, 6, 6);
+				int highestY = Math.max(Math.abs(triangle.getPointA().y),
+						Math.max(Math.abs(triangle.getPointB().y), Math.abs(triangle.getPointC().y)));
+				g2d.drawOval(triangle.getPointA().x - this.HANDLE_OFFSET, triangle.getPointA().y - this.HANDLE_OFFSET, this.HANDLE_WIDTH,
+						this.HANDLE_WIDTH);
+				g2d.drawOval(triangle.getPointB().x - this.HANDLE_OFFSET, triangle.getPointB().y - this.HANDLE_OFFSET, this.HANDLE_WIDTH,
+						this.HANDLE_WIDTH);
+				g2d.drawOval(triangle.getPointC().x - this.HANDLE_OFFSET, triangle.getPointC().y - this.HANDLE_OFFSET, this.HANDLE_WIDTH,
+						this.HANDLE_WIDTH);
+				g2d.setColor(this.ROTATION_HANDLE_COLOR);
+				g2d.drawOval(-this.HANDLE_OFFSET, -highestY - View.ROTATION_HANDLE_Y_OFFSET, this.HANDLE_WIDTH, this.HANDLE_WIDTH);
 				break;
 
 			default :
@@ -211,7 +223,11 @@ public class View implements ViewRefresher
 
 	public Color invertColor(Color color)
 	{
-		return new Color(255 - color.getRed(), 255 - color.getGreen(), 255 - color.getBlue());
+		if (!color.equals(Color.white))
+		{
+			return new Color(255 - color.getRed(), 255 - color.getGreen(), 255 - color.getBlue());
+		}
+		else return this.WHITE_SELECT_COLOR;
 	}
 
 }

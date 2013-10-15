@@ -40,17 +40,17 @@ public class Triangle extends Shape
 
 	public void setPointA(Point pointA)
 	{
-		this.pointA = new Point(pointA.x - this.getOffset().x, pointA.y - this.getOffset().y);
+		this.pointA = pointA;
 	}
 
 	public void setPointB(Point pointB)
 	{
-		this.pointB = new Point(pointB.x - this.getOffset().x, pointB.y - this.getOffset().y);
+		this.pointB = pointB;
 	}
 
 	public void setPointC(Point pointC)
 	{
-		this.pointC = new Point(pointC.x - this.getOffset().x, pointC.y - this.getOffset().y);
+		this.pointC = pointC;
 	}
 
 	@Override
