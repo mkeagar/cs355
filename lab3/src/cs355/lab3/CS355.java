@@ -3,7 +3,7 @@
  * the editor.
  */
 
-package cs355.lab2;
+package cs355.lab3;
 
 import java.awt.Color;
 
@@ -17,19 +17,19 @@ public class CS355
 {
 
 	/**
-	 * @param args the command line arguments
+	 * @param args
+	 *            the command line arguments
 	 */
 	public static void main(String[] args)
 	{
-		GUIFunctions.createCS355Frame(Controller.inst(), View.inst(),
-				MyMouseListener.inst(), MyMouseMotionListener.inst());
+		GUIFunctions.createCS355Frame(Controller.inst(), View.inst(), MyMouseListener.inst(), MyMouseMotionListener.inst());
 		GUIFunctions.refresh();
 		GUIFunctions.changeSelectedColor(Color.WHITE);
 		GUIFunctions.setHScrollBarMin(0);
 		GUIFunctions.setVScrollBarMin(0);
 		GUIFunctions.setHScrollBarMax(512);
 		GUIFunctions.setVScrollBarMax(512);
-		GUIFunctions.setHScrollBarKnob(256);
-		GUIFunctions.setVScrollBarKnob(256);
+		GUIFunctions.setHScrollBarKnob(128);
+		GUIFunctions.setVScrollBarKnob(128);
 	}
 }

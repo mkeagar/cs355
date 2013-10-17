@@ -1,10 +1,10 @@
 
-package cs355.lab2;
+package cs355.lab3;
 
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
-import cs355.lab2.Controller.MouseButtonState;
+import cs355.lab3.Controller.MouseButtonState;
 
 public class MyMouseListener implements MouseListener
 {

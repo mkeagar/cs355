@@ -1,40 +1,34 @@
 /*
- * To change this template, choose Tools | Templates and open the template in
- * the editor.
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
  */
-
 package cs355;
 
 import java.awt.Color;
 
 /**
- * 
+ *
  * @author Talonos
  */
-public interface CS355Controller
+public interface CS355Controller 
 {
 
-	void circleButtonHit();
+    void colorButtonHit(Color c);
+    void triangleButtonHit();
+    void squareButtonHit();
+    void rectangleButtonHit();
+    void circleButtonHit();
+    void ellipseButtonHit();
 
-	void colorButtonHit(Color c);
+    public void lineButtonHit();
 
-	void ellipseButtonHit();
+    public void selectButtonHit();
 
-	public void hScrollbarChanged(int value);
+    public void zoomInButtonHit();
 
-	public void lineButtonHit();
+    public void zoomOutButtonHit();
 
-	void rectangleButtonHit();
+    public void hScrollbarChanged(int value);
 
-	public void selectButtonHit();
-
-	void squareButtonHit();
-
-	void triangleButtonHit();
-
-	public void vScrollbarChanged(int value);
-
-	public void zoomInButtonHit();
-
-	public void zoomOutButtonHit();
+    public void vScrollbarChanged(int value);
 }
