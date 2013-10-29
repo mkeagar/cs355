@@ -1,4 +1,4 @@
-package common;
+package cs355.common;
 
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;

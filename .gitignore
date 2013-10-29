@@ -1,3 +1,6 @@
 *.class
 # Thumbnail garbage #
 Thumbs.db
+
+/lab4/libs
+/lab4/bin

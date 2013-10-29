@@ -1,8 +1,8 @@
 package cs355.lab3;
 
-import static common.ConvertCoordinates.objectToWorld;
-import static common.ConvertCoordinates.viewToWorld;
-import static common.ConvertCoordinates.worldToObject;
+import static cs355.common.ConvertCoordinates.objectToWorld;
+import static cs355.common.ConvertCoordinates.viewToWorld;
+import static cs355.common.ConvertCoordinates.worldToObject;
 import static java.lang.Math.PI;
 import static java.lang.Math.abs;
 import static java.lang.Math.atan2;
