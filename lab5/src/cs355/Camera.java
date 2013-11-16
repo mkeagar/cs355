@@ -23,6 +23,7 @@ public class Camera
 	}
 
 	// Methods
+
 	public Point3D getLocation()
 	{
 		return this.location;

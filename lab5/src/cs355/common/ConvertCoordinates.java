@@ -18,7 +18,7 @@ public abstract class ConvertCoordinates
 	// Variables
 	private static Controller controller = Controller.inst();
 	private static final float nearPlane = 1.0f;
-	private static final float farPlane = 100.0f;
+	private static final float farPlane = 250.0f;
 
 	// Methods
 	public static Point objectToWorld(Point op, Shape shape)
@@ -77,23 +77,30 @@ public abstract class ConvertCoordinates
 		return vp;
 	}
 
-	public static Point3D threeDWorldToClip(Point3D point)
+	public static double[] threeDWorldToClip(Point3D point)
 	{
 		Camera camera = Controller.inst().getCamera();
 		float theta = camera.getYaw();
 		double c_x = camera.getLocation().x;
 		double c_y = camera.getLocation().y;
 		double c_z = camera.getLocation().z;
+		double e = (farPlane + nearPlane) / (farPlane - nearPlane);
+		double f = (-2 * nearPlane * farPlane) / (farPlane - nearPlane);
+		double zoom = (1 / Math.tan(Math.PI / 6));
 
-		double x = (sqrt(3) * point.x * cos(theta) + sqrt(3) * point.z * sin(theta) + sqrt(3) * (-c_x * cos(theta) - c_z * sin(theta)))
-				/ (-c_z * cos(theta) + point.z * cos(theta) + c_x * sin(theta) - point.x * sin(theta));
-		double y = (sqrt(3) * point.y - sqrt(3) * c_y) / (-c_z * cos(theta) + point.z * cos(theta) + c_x * sin(theta) - point.x * sin(theta));
-		double z = ((-2 * nearPlane * farPlane / (farPlane - nearPlane)) + ((farPlane + nearPlane) / (farPlane - nearPlane)) * point.z * cos(theta)
-				- ((farPlane + nearPlane) / (farPlane - nearPlane)) * x * sin(theta) + ((farPlane + nearPlane) / (farPlane - nearPlane))
-				* (c_x * sin(theta) - c_z * cos(theta)))
-				/ (-c_z * cos(theta) + point.z * cos(theta) + c_x * sin(theta) - point.x * sin(theta));
+//		double x = (-c_x * zoom) * cos(theta) + zoom * point.x * cos(theta) + c_z * zoom * sin(theta) - zoom * point.z * sin(theta);
+//		double y = zoom * point.y - c_y * zoom;
+//		double z = (f) + (e) * point.z * cos(theta) - c_z * (e) * cos(theta) + e * point.x * sin(theta) - c_x * (e) * sin(theta);
+//		double bigW = -c_z * cos(theta) + point.z * cos(theta) - c_x * sin(theta) + point.x * sin(theta);
 
-		return new Point3D(x, y, z);
+		 double x = (sqrt(3) * point.x * cos(theta) + sqrt(3) * point.z * sin(theta) + sqrt(3) * (-c_x * cos(theta) - c_z * sin(theta)));
+		 double y = (sqrt(3) * point.y - sqrt(3) * c_y);
+		 double z = (f + e * point.z * cos(theta) - e * x * sin(theta) + e * (c_x * sin(theta) - c_z * cos(theta)));
+		 double bigW = (-c_z * cos(theta) + point.z * cos(theta) + c_x * sin(theta) - point.x * sin(theta));
+
+		double[] result = {x, y, z, bigW};
+
+		return result;
 	}
 
 	public static Point3D clipToScreen(Point3D point)
@@ -108,15 +115,25 @@ public abstract class ConvertCoordinates
 		return new Point3D(x, y, 1);
 	}
 
-	public static boolean clipTest(Point3D start, Point3D end)
+	public static boolean clipTest(double[] start, double[] end)
 	{
-		if ((start.x > 1.0 && end.x > 1.0) || (start.x < -1.0 && end.x < -1.0)) return true;
+		double startX = start[0];
+		double startY = start[1];
+		double startZ = start[2];
+		double startW = start[3];
 
-		if ((start.y > 1.0 && end.y > 1.0) || (start.y < -1.0 && end.y < -1.0)) return true;
+		double endX = end[0];
+		double endY = end[1];
+		double endZ = end[2];
+		double endW = end[3];
 
-		if ((start.z > 1.0 && end.z > 1.0)) return true;
+		if ((startX > startW && endX > endW) || (startX < -startW && endX < -endW)) return true;
 
-		if (start.z <= 0.0 || end.z <= 0.0) return true;
+		if ((startY > startW && endY > endW) || (startY < -startW && endY < -endW)) return true;
+
+		if ((startZ > startW && endZ > endW)) return true;
+
+		if (startZ <= -startW || endZ <= -endW) return true;
 
 		return false;
 	}

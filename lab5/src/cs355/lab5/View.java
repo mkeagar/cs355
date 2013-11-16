@@ -178,18 +178,19 @@ public class View implements ViewRefresher
 				Color houseColor = Color.cyan;
 				Line3D line = iter.next();
 
-				Point3D newStart = threeDWorldToClip(line.start);
-				Point3D newEnd = threeDWorldToClip(line.end);
+				double[] newStart = threeDWorldToClip(line.start);
+				double[] newEnd = threeDWorldToClip(line.end);
 
+				// if (newStart != null || newEnd != null)
 				if (!clipTest(newStart, newEnd))
 				{
-					newStart = clipToScreen(newStart);
-					newEnd = clipToScreen(newEnd);
+					Point3D start = clipToScreen(new Point3D(newStart[0] / newStart[3], newStart[1] / newStart[3], newStart[2] / newStart[3]));
+					Point3D end = clipToScreen(new Point3D(newEnd[0] / newEnd[3], newEnd[1] / newEnd[3], newEnd[2] / newEnd[3]));
 
 					g2d.setColor(houseColor);
 					g2d.setTransform(new AffineTransform());
 
-					g2d.drawLine((int) round(newStart.x), (int) round(newStart.y), (int) round(newEnd.x), (int) round(newEnd.y));
+					g2d.drawLine((int) round(start.x), (int) round(start.y), (int) round(end.x), (int) round(end.y));
 				}
 			}
 		}

@@ -1,0 +1,46 @@
+Mike Eagar
+
+Pipeline for CS355 lab 5
+
+	Matrices for pipeline
+
+		constants:
+			near plane = n = 1.0
+			far plane = f = 250.0
+
+		Clip Matrix = {{1/tan(pi/6),0,0,0},{0,1/tan(pi/6),0,0},{0,0,(f+n)/(f-n),(-2nf/(f-n))},{0,0,1,0}}
+		Rotation Matrix = {{cos(theta),0,sin(theta),0},{0,1,0,0},{-sin(theta),0,cos(theta),0},{0,0,0,1}}
+		Camera Translation Matrix = {{1,0,0,-a},{0,1,0,-b},{0,0,1,-c},{0,0,0,1}}
+		Initial Point (4x1) matrix = {{x},{y},{z},{1}}
+
+	Pipeline to get {{X},{Y},{Z},{W}} 4x1 Matrix = {Clip Matrix}{Rotation Matrix}{Camera Translation Matrix}{Initial Point Matrix}
+
+		X = sqrt(3)*x*cos(theta)+sqrt(3)*z*sin(theta)+sqrt(3)*(-c_x*cos(theta)-c_z*sin(theta))
+		Y = sqrt(3)*y-sqrt(3)*c_y
+		Z = (-2nf/(f-n))+((f+n)/(f-n))*z*cos(theta)-((f+n)/(f-n))*x*sin(theta)+((f+n)/(f-n))*(c_x*sin(theta)-c_z*cos(theta))
+		W = -c_z*cos(theta)+z*cos(theta)+c_x*sin(theta)-x*sin(theta)
+	
+	Next I do the testing to see if the Lines should be drawn by comparing X,Y, and Z to +/-W.
+
+	For the points that should be drawn, I normalize them with by dividing by W.
+
+		i = X / W
+		j = Y / W
+		k = Z / W
+
+	At this point, I need to use the following matrices in a pipeline to convert the point to View space as follows:
+		s = scale factor
+		m = w_x (w sub x, or window sub x.  It is the x location of the scroll bars in the screen world)
+		n = w_y (w sub y, or window sub y.  It is the y location of the scroll bars in the screen world)
+
+		Scale Matrix = {{s, 0, -m}, {0, s, -n}, {0, 0, 1}}
+		View Transform Matrix = {{1024, 0, 1024}, {0, -1024, 1024}, {0, 0, 1}}
+		Normalized Point Matrix (3x1) = {{i}, {j}, {1}}  (We only care about the x and y values at this point.)
+
+	Pipeline to get final 3x1 {{x},{y},{1}} Matrix = {Scale Matrix}{View Transform Matrix}{Normalized Point Matrix}
+
+		Final x = -w_x + (1024 + 1024*i)*scale
+		Final y = -w_y + 1024*s - 1024*j*scale
+
+
+	In my code, the pipeline conversions and clip testing are done in my ConvertCoordinates Class, in the threeDWorldToClip(), clipToScreen() and clipTest() methods.  These methods are called within my View when drawing objects.

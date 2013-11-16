@@ -51,7 +51,7 @@ public class Controller implements CS355Controller
 	private final int VIEWSIZE = 512;
 	private boolean displayHouse = false;
 	private Camera camera = new Camera(new Point3D(0f, 5f, -25f));
-	private final float step = 1.0f;
+	private final float step = 1.2f;
 
 	// Singleton Stuff
 	private static Controller instance = null;
@@ -916,15 +916,20 @@ public class Controller implements CS355Controller
 	public void vScrollbarChanged(int value)
 	{
 		this.viewOrigin = new Point(this.viewOrigin.x, value);
-
-		GUIFunctions.refresh();
+		this.setScrollBars();
 	}
 
 	@Override
 	public void hScrollbarChanged(int value)
 	{
 		this.viewOrigin = new Point(value, this.viewOrigin.y);
+		this.setScrollBars();
+	}
 
+	public void setScrollBars()
+	{
+		GUIFunctions.setHScrollBarMax((int) (this.VIEWSIZE * this.scaleFactor));
+		GUIFunctions.setVScrollBarMax((int) (this.VIEWSIZE * this.scaleFactor));
 		GUIFunctions.refresh();
 	}
 
@@ -934,11 +939,8 @@ public class Controller implements CS355Controller
 		if (this.scaleFactor != 4.0)
 		{
 			this.scaleFactor *= 2;
-			GUIFunctions.setHScrollBarMax((int) (this.VIEWSIZE * this.scaleFactor));
-			GUIFunctions.setVScrollBarMax((int) (this.VIEWSIZE * this.scaleFactor));
+			this.setScrollBars();
 		}
-
-		GUIFunctions.refresh();
 	}
 
 	@Override
@@ -947,11 +949,8 @@ public class Controller implements CS355Controller
 		if (this.scaleFactor != 0.25)
 		{
 			this.scaleFactor /= 2;
-			GUIFunctions.setHScrollBarMax((int) (this.VIEWSIZE * this.scaleFactor));
-			GUIFunctions.setVScrollBarMax((int) (this.VIEWSIZE * this.scaleFactor));
+			this.setScrollBars();
 		}
-
-		GUIFunctions.refresh();
 	}
 
 	@Override
