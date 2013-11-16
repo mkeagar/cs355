@@ -15,8 +15,6 @@ import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.util.Iterator;
 
-
-
 import cs355.Camera;
 import cs355.Point3D;
 import cs355.CS355Controller;
@@ -52,7 +50,7 @@ public class Controller implements CS355Controller
 	private double scaleFactor = 1.0d;
 	private final int VIEWSIZE = 512;
 	private boolean displayHouse = false;
-	private Camera camera = new Camera(new Point3D(0f, -5f, -25f));
+	private Camera camera = new Camera(new Point3D(0f, 5f, -25f));
 	private final float step = 1.0f;
 
 	// Singleton Stuff
@@ -964,7 +962,6 @@ public class Controller implements CS355Controller
 		GUIFunctions.refresh();
 	}
 
-
 	@Override
 	public void keyPressed(Iterator<Integer> iterator)
 	{
@@ -983,7 +980,7 @@ public class Controller implements CS355Controller
 						break;
 						
 					case KeyEvent.VK_A:
-						this.camera.strafe(this.step);
+						this.camera.strafe(-this.step);
 						break;
 					
 					case KeyEvent.VK_S:
@@ -991,35 +988,42 @@ public class Controller implements CS355Controller
 						break;
 					
 					case KeyEvent.VK_D:
-						this.camera.strafe(-this.step);
+						this.camera.strafe(this.step);
 						break;
 					
 					case KeyEvent.VK_Q:
-						this.camera.yaw(-this.step);
-						break;
-					
-					case KeyEvent.VK_E:
 						this.camera.yaw(this.step);
 						break;
 					
-					case KeyEvent.VK_R:
-						this.camera.changeAltitude(-this.step);
+					case KeyEvent.VK_E:
+						this.camera.yaw(-this.step);
 						break;
 					
-					case KeyEvent.VK_F:
+					case KeyEvent.VK_R:
 						this.camera.changeAltitude(this.step);
 						break;
 					
-					case KeyEvent.VK_H:
-						this.camera = new Camera(new Point3D(0f, -5f, -25f));
+					case KeyEvent.VK_F:
+						this.camera.changeAltitude(-this.step);
 						break;
 					
-					default:
-						System.nanoTime();
+					case KeyEvent.VK_H:
+						this.camera = new Camera(new Point3D(0f, 5f, -25f));
+						break;
 				}
 			}
 		}
 
 		GUIFunctions.refresh();
+	}
+
+	public Camera getCamera()
+	{
+		return this.camera;
+	}
+
+	public boolean isHouseVisible()
+	{
+		return this.displayHouse;
 	}
 }

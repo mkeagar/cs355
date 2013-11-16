@@ -35,7 +35,7 @@ public class Camera
 
 	public float getYaw()
 	{
-		return this.yaw;
+		return (float) Math.toRadians(this.yaw);
 	}
 
 	public void yaw(float yaw)

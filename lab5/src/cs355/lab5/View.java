@@ -2,11 +2,16 @@ package cs355.lab5;
 
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
+import static java.lang.Math.round;
+import static cs355.common.ConvertCoordinates.clipTest;
+import static cs355.common.ConvertCoordinates.clipToScreen;
+import static cs355.common.ConvertCoordinates.threeDWorldToClip;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
+import java.util.Iterator;
 
-import cs355.ViewRefresher;
+import cs355.*;
 import cs355.model.*;
 import cs355.model.Rectangle;
 import cs355.model.Shape;
@@ -160,6 +165,35 @@ public class View implements ViewRefresher
 			g2d.setColor(this.selectedShape.getColor());
 			g2d.setTransform(new AffineTransform());
 		}
+
+		boolean drawHouse = Controller.inst().isHouseVisible();
+
+		if (drawHouse)
+		{
+			HouseModel house = new HouseModel();
+			Iterator<Line3D> iter = house.getLines();
+
+			while (iter.hasNext())
+			{
+				Color houseColor = Color.cyan;
+				Line3D line = iter.next();
+
+				Point3D newStart = threeDWorldToClip(line.start);
+				Point3D newEnd = threeDWorldToClip(line.end);
+
+				if (!clipTest(newStart, newEnd))
+				{
+					newStart = clipToScreen(newStart);
+					newEnd = clipToScreen(newEnd);
+
+					g2d.setColor(houseColor);
+					g2d.setTransform(new AffineTransform());
+
+					g2d.drawLine((int) round(newStart.x), (int) round(newStart.y), (int) round(newEnd.x), (int) round(newEnd.y));
+				}
+			}
+		}
+
 	}
 
 	public void drawHandles(Graphics2D g2d)
