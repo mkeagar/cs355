@@ -9,6 +9,9 @@ import static cs355.common.ConvertCoordinates.threeDWorldToClip;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
+import java.awt.image.MemoryImageSource;
+import java.awt.image.WritableRaster;
 import java.util.Iterator;
 
 import cs355.*;
@@ -60,6 +63,15 @@ public class View implements ViewRefresher
 	{
 		this.selectedShapeType = ShapeType.NONE;
 		int scaledSelectStroke = ((int) (this.SELECT_STROKE / Controller.inst().getScaleFactor()));
+
+		boolean drawBackground = Controller.inst().isBackgroundVisible();
+		Image2D image = Controller.inst().getBackgroundImage();
+
+		if (drawBackground && image != null)
+		{
+			BufferedImage bgImage = this.getImageFromArray(image.getPixelsSingleArray(), image.getWidth(), image.getHeight());
+			g2d.drawImage(bgImage, null, 0, 0);
+		}
 
 		for (int i = 0; i < Model.inst().size(); i++)
 		{
@@ -289,6 +301,14 @@ public class View implements ViewRefresher
 			return new Color(255 - color.getRed(), 255 - color.getGreen(), 255 - color.getBlue());
 		}
 		else return this.WHITE_SELECT_COLOR;
+	}
+
+	public BufferedImage getImageFromArray(int[] pixels, int width, int height)
+	{
+		BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
+		WritableRaster raster = image.getRaster();
+		raster.setPixels(0, 0, width, height, pixels);
+		return image;
 	}
 
 }

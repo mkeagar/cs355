@@ -1,6 +1,8 @@
 package cs355.model;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 
 public class Image2D
 {
@@ -34,14 +36,57 @@ public class Image2D
 		this.width = width;
 	}
 
-	public int[][] getPixels()
+	public int[][] getPixels2D()
 	{
 		return this.pixels;
+	}
+
+	public int[] getPixelsSingleArray()
+	{
+		int[] pixels = new int[this.width * this.height];
+
+		for (int j = 0, pixNum = 0; j < this.height; j++)
+			for (int i = 0; i < this.width; i++)
+			{
+				pixels[pixNum] = this.pixels[i][j];
+				pixNum++;
+			}
+
+		return pixels;
 	}
 
 	public void setPixels(int[][] pixels)
 	{
 		this.pixels = pixels;
+	}
+
+	public void changeBrightness(int deltaBrightness)
+	{
+		for (int row = 0; row < this.height; row++)
+			for (int col = 0; col < this.width; col++)
+			{
+				this.pixels[col][row] += deltaBrightness;
+				if (this.pixels[col][row] < 0) this.pixels[col][row] = 0;
+				if (this.pixels[col][row] > 255) this.pixels[col][row] = 255;
+			}
+	}
+
+	public Image2D deepCopy()
+	{
+		int[][] copy = new int[this.width][this.height];
+
+		for (int i = 0, row = 0, col = 0; i < this.width * this.height; i++)
+		{
+			copy[col][row] = this.pixels[col][row];
+			col++;
+			if (col == this.width)
+			{
+				col = 0;
+				row++;
+			}
+		}
+
+		return new Image2D(copy);
 	}
 
 	@Override
@@ -72,6 +117,250 @@ public class Image2D
 	public String toString()
 	{
 		return "Image2D [height=" + height + ", width=" + width + ", pixels=" + Arrays.toString(pixels) + "]";
+	}
+
+	public void print()
+	{
+		for (int j = 0; j < this.height; j++)
+			for (int i = 0; i < this.width; i++)
+			{
+				System.out.print(this.pixels[i][j] + " ");
+				if (i == width - 1) System.out.println();
+			}
+	}
+
+	public void changeContrast(int contrastAmountNum)
+	{
+		int[][] newPixels = new int[this.width][this.height];
+
+		for (int i = 0, row = 0, col = 0; i < this.width * this.height; i++)
+		{
+			newPixels[col][row] = (int) Math.round(Math.pow((contrastAmountNum + 100.0) / 100.0, 4.0) * (this.pixels[col][row] - 128.0) + 128.0);
+			if (newPixels[col][row] < 0) newPixels[col][row] = 0;
+			if (newPixels[col][row] > 255) newPixels[col][row] = 255;
+			
+			col++;
+			if (col == width)
+			{
+				col = 0;
+				row++;
+			}
+		}
+
+		this.pixels = newPixels;
+	}
+
+	public void medianBlur()
+	{
+		int[][] newPixels = new int[this.width][this.height];
+
+		for (int i = 0, row = 0, col = 0; i < this.width * this.height; i++)
+		{
+			ArrayList<Double> temp = new ArrayList<Double>();
+
+			if (row == 0)
+			{
+				if (col == 0)
+				{
+					temp.add((double) pixels[col][row]);
+					temp.add((double) pixels[col + 1][row]);
+					temp.add((double) pixels[col][row + 1]);
+					temp.add((double) pixels[col + 1][row + 1]);
+					Collections.sort(temp);
+					newPixels[col][row] = (int) Math.round(this.findMedian(temp));
+				}
+				else if (col == this.width - 1)
+				{
+					temp.add((double) pixels[col - 1][row]);
+					temp.add((double) pixels[col][row]);
+					temp.add((double) pixels[col - 1][row + 1]);
+					temp.add((double) pixels[col][row + 1]);
+					Collections.sort(temp);
+					newPixels[col][row] = (int) Math.round(this.findMedian(temp));
+				}
+				else
+				{
+					temp.add((double) pixels[col - 1][row]);
+					temp.add((double) pixels[col][row]);
+					temp.add((double) pixels[col + 1][row]);
+					temp.add((double) pixels[col - 1][row + 1]);
+					temp.add((double) pixels[col][row + 1]);
+					temp.add((double) pixels[col + 1][row + 1]);
+					Collections.sort(temp);
+					newPixels[col][row] = (int) Math.round(this.findMedian(temp));
+				}
+			}
+			else if (row == this.height - 1)
+			{
+				if (col == 0)
+				{
+					temp.add((double) pixels[col][row - 1]);
+					temp.add((double) pixels[col + 1][row - 1]);
+					temp.add((double) pixels[col][row]);
+					temp.add((double) pixels[col + 1][row]);
+					Collections.sort(temp);
+					newPixels[col][row] = (int) Math.round(this.findMedian(temp));
+				}
+				else if (col == this.width - 1)
+				{
+					temp.add((double) pixels[col - 1][row - 1]);
+					temp.add((double) pixels[col][row - 1]);
+					temp.add((double) pixels[col - 1][row]);
+					temp.add((double) pixels[col][row]);
+					Collections.sort(temp);
+					newPixels[col][row] = (int) Math.round(this.findMedian(temp));
+				}
+				else
+				{
+					temp.add((double) pixels[col - 1][row - 1]);
+					temp.add((double) pixels[col][row - 1]);
+					temp.add((double) pixels[col + 1][row - 1]);
+					temp.add((double) pixels[col - 1][row]);
+					temp.add((double) pixels[col][row]);
+					temp.add((double) pixels[col + 1][row]);
+					Collections.sort(temp);
+					newPixels[col][row] = (int) Math.round(this.findMedian(temp));
+				}
+			}
+			else
+			{
+				if (col == 0)
+				{
+					temp.add((double) pixels[col][row - 1]);
+					temp.add((double) pixels[col + 1][row - 1]);
+					temp.add((double) pixels[col][row]);
+					temp.add((double) pixels[col + 1][row]);
+					temp.add((double) pixels[col][row + 1]);
+					temp.add((double) pixels[col + 1][row + 1]);
+					Collections.sort(temp);
+					newPixels[col][row] = (int) Math.round(this.findMedian(temp));
+				}
+				else if (col == this.width - 1)
+				{
+					temp.add((double) pixels[col - 1][row - 1]);
+					temp.add((double) pixels[col][row - 1]);
+					temp.add((double) pixels[col - 1][row]);
+					temp.add((double) pixels[col][row]);
+					temp.add((double) pixels[col - 1][row + 1]);
+					temp.add((double) pixels[col][row + 1]);
+					Collections.sort(temp);
+					newPixels[col][row] = (int) Math.round(this.findMedian(temp));
+				}
+				else
+				{
+					temp.add((double) pixels[col - 1][row - 1]);
+					temp.add((double) pixels[col][row - 1]);
+					temp.add((double) pixels[col + 1][row - 1]);
+					temp.add((double) pixels[col - 1][row]);
+					temp.add((double) pixels[col][row]);
+					temp.add((double) pixels[col + 1][row]);
+					temp.add((double) pixels[col - 1][row + 1]);
+					temp.add((double) pixels[col][row + 1]);
+					temp.add((double) pixels[col + 1][row + 1]);
+					Collections.sort(temp);
+					newPixels[col][row] = (int) Math.round(this.findMedian(temp));
+				}
+			}
+
+			if (newPixels[col][row] < 0) newPixels[col][row] = 0;
+			if (newPixels[col][row] > 255) newPixels[col][row] = 255;
+
+			col++;
+			if (col == this.width)
+			{
+				col = 0;
+				row++;
+			}
+		}
+
+		this.pixels = newPixels;
+	}
+
+	public void uniformBlur()
+	{
+		int[][] newPixels = new int[this.width][this.height];
+
+		for (int i = 0, row = 0, col = 0; i < this.width * this.height; i++)
+		{
+			if (row == 0)
+			{
+				if (col == 0)
+				{
+					newPixels[col][row] = (int) Math
+							.round((this.pixels[col][row] + this.pixels[col + 1][row] + this.pixels[col + 1][row + 1] + this.pixels[col][row + 1]) / 4.0);
+				}
+				else if (col == this.width - 1)
+				{
+					newPixels[col][row] = (int) Math
+							.round((this.pixels[col][row] + this.pixels[col - 1][row] + this.pixels[col - 1][row + 1] + this.pixels[col][row + 1]) / 4.0);
+				}
+				else
+				{
+					newPixels[col][row] = (int) Math.round((this.pixels[col][row] + this.pixels[col + 1][row] + this.pixels[col + 1][row + 1]
+							+ this.pixels[col][row + 1] + this.pixels[col - 1][row + 1] + this.pixels[col - 1][row]) / 6.0);
+				}
+			}
+			else if (row == this.height - 1)
+			{
+				if (col == 0)
+				{
+					newPixels[col][row] = (int) Math
+							.round((this.pixels[col][row] + this.pixels[col + 1][row] + this.pixels[col + 1][row - 1] + this.pixels[col][row - 1]) / 4.0);
+				}
+				else if (col == this.width - 1)
+				{
+					newPixels[col][row] = (int) Math
+							.round((this.pixels[col][row] + this.pixels[col - 1][row] + this.pixels[col - 1][row - 1] + this.pixels[col][row - 1]) / 4.0);
+				}
+				else
+				{
+					newPixels[col][row] = (int) Math.round((this.pixels[col][row] + this.pixels[col + 1][row] + this.pixels[col + 1][row - 1]
+							+ this.pixels[col][row - 1] + this.pixels[col - 1][row - 1] + this.pixels[col - 1][row]) / 6.0);
+				}
+			}
+			else
+			{
+				if (col == 0)
+				{
+					newPixels[col][row] = (int) Math.round((this.pixels[col][row - 1] + this.pixels[col + 1][row - 1] + this.pixels[col][row]
+							+ this.pixels[col + 1][row] + this.pixels[col][row + 1] + this.pixels[col + 1][row + 1]) / 6.0);
+				}
+				else if (col == this.width - 1)
+				{
+					newPixels[col][row] = (int) Math.round((this.pixels[col - 1][row - 1] + this.pixels[col][row - 1] + this.pixels[col - 1][row]
+							+ this.pixels[col][row] + this.pixels[col - 1][row + 1] + this.pixels[col][row + 1]) / 6.0);
+				}
+				else
+				{
+					newPixels[col][row] = (int) Math.round((this.pixels[col - 1][row - 1] + this.pixels[col][row - 1] + this.pixels[col + 1][row - 1]
+							+ this.pixels[col - 1][row] + this.pixels[col][row] + this.pixels[col + 1][row] + this.pixels[col - 1][row + 1]
+							+ this.pixels[col][row + 1] + this.pixels[col + 1][row + 1]) / 9.0);
+				}
+			}
+
+			col++;
+			if (col == this.width)
+			{
+				col = 0;
+				row++;
+			}
+		}
+
+		this.pixels = newPixels;
+	}
+
+	// array input must be sorted
+	public double findMedian(ArrayList<Double> sortedInput)
+	{
+		int middle = sortedInput.size() / 2;
+		if (sortedInput.size() % 2 == 1)
+		{
+			return sortedInput.get(middle);
+		}
+		else
+		{
+			return (sortedInput.get(middle - 1) + sortedInput.get(middle)) / 2.0;
+		}
 	}
 
 }

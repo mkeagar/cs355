@@ -33,7 +33,7 @@ class CS355Frame extends javax.swing.JFrame implements KeyListener
 
     private static CS355Frame instance;
     private Color selectedColor = Color.BLACK;
-    private Set<Integer>keysPressed = new TreeSet<>();
+    private final Set<Integer>keysPressed = new TreeSet<>();
     Semaphore protectKeyList = new Semaphore(1);
     
     static CS355Frame inst()
@@ -137,76 +137,87 @@ class CS355Frame extends javax.swing.JFrame implements KeyListener
 
         jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cs355/res/Colors.png"))); // NOI18N
         jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
             }
         });
 
         jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cs355/res/Line.png"))); // NOI18N
         jButton2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton2ActionPerformed(evt);
             }
         });
 
         jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cs355/res/Square.png"))); // NOI18N
         jButton3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton3ActionPerformed(evt);
             }
         });
 
         jButton4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cs355/res/Rectangle.png"))); // NOI18N
         jButton4.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton4ActionPerformed(evt);
             }
         });
 
         jButton5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cs355/res/Circle.png"))); // NOI18N
         jButton5.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton5ActionPerformed(evt);
             }
         });
 
         jButton6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cs355/res/Ellipse.png"))); // NOI18N
         jButton6.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton6ActionPerformed(evt);
             }
         });
 
         jButton7.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cs355/res/Triangle.png"))); // NOI18N
         jButton7.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton7ActionPerformed(evt);
             }
         });
 
         jButton8.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cs355/res/Select.png"))); // NOI18N
         jButton8.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton8ActionPerformed(evt);
             }
         });
 
         jButton9.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cs355/res/ZoomIn.png"))); // NOI18N
         jButton9.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton9ActionPerformed(evt);
             }
         });
 
         jButton10.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cs355/res/ZoomOut.png"))); // NOI18N
         jButton10.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton10ActionPerformed(evt);
             }
         });
 
         jScrollBar1.addAdjustmentListener(new java.awt.event.AdjustmentListener() {
-            public void adjustmentValueChanged(java.awt.event.AdjustmentEvent evt) {
+            @Override
+			public void adjustmentValueChanged(java.awt.event.AdjustmentEvent evt) {
                 jScrollBar1AdjustmentValueChanged(evt);
             }
         });
@@ -215,21 +226,24 @@ class CS355Frame extends javax.swing.JFrame implements KeyListener
         jScrollBar2.setValue(1);
         jScrollBar2.setVisibleAmount(99);
         jScrollBar2.addAdjustmentListener(new java.awt.event.AdjustmentListener() {
-            public void adjustmentValueChanged(java.awt.event.AdjustmentEvent evt) {
+            @Override
+			public void adjustmentValueChanged(java.awt.event.AdjustmentEvent evt) {
                 jScrollBar2AdjustmentValueChanged(evt);
             }
         });
 
         jButton11.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cs355/res/House.png"))); // NOI18N
         jButton11.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton11ActionPerformed(evt);
             }
         });
 
-        jButton12.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cs355/res/House.png"))); // NOI18N
+		jButton12.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cs355/res/House.png"))); // NOI18N
         jButton12.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton12ActionPerformed(evt);
             }
         });
@@ -238,7 +252,8 @@ class CS355Frame extends javax.swing.JFrame implements KeyListener
 
         jMenuItem1.setText("Load");
         jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItem1ActionPerformed(evt);
             }
         });
@@ -247,7 +262,8 @@ class CS355Frame extends javax.swing.JFrame implements KeyListener
         jMenuItem2.setText("Save");
         jMenuItem2.setToolTipText("");
         jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItem2ActionPerformed(evt);
             }
         });
@@ -255,7 +271,8 @@ class CS355Frame extends javax.swing.JFrame implements KeyListener
 
         jMenuItem3.setText("Quit");
         jMenuItem3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItem3ActionPerformed(evt);
             }
         });
@@ -267,7 +284,8 @@ class CS355Frame extends javax.swing.JFrame implements KeyListener
 
         jMenuItem4.setText("Brightness");
         jMenuItem4.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItem4ActionPerformed(evt);
             }
         });
@@ -275,7 +293,8 @@ class CS355Frame extends javax.swing.JFrame implements KeyListener
 
         jMenuItem5.setText("Contrast");
         jMenuItem5.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItem5ActionPerformed(evt);
             }
         });
@@ -283,7 +302,8 @@ class CS355Frame extends javax.swing.JFrame implements KeyListener
 
         jMenuItem6.setText("Blur (Uniform)");
         jMenuItem6.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItem6ActionPerformed(evt);
             }
         });
@@ -291,7 +311,8 @@ class CS355Frame extends javax.swing.JFrame implements KeyListener
 
         jMenuItem7.setText("Blur (Median)");
         jMenuItem7.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItem7ActionPerformed(evt);
             }
         });
@@ -299,7 +320,8 @@ class CS355Frame extends javax.swing.JFrame implements KeyListener
 
         jMenuItem8.setText("Sharpen");
         jMenuItem8.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItem8ActionPerformed(evt);
             }
         });
@@ -307,7 +329,8 @@ class CS355Frame extends javax.swing.JFrame implements KeyListener
 
         jMenuItem9.setText("Detect Edges");
         jMenuItem9.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItem9ActionPerformed(evt);
             }
         });
@@ -561,7 +584,8 @@ class CS355Frame extends javax.swing.JFrame implements KeyListener
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
+            @Override
+			public void run() {
                 new CS355Frame(null, null, null, null).setVisible(true);
             }
         });

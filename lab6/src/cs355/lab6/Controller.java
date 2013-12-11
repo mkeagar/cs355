@@ -14,6 +14,8 @@ import java.awt.Color;
 import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferByte;
+import java.awt.image.DataBufferInt;
 import java.util.Iterator;
 
 import cs355.Camera;
@@ -51,6 +53,8 @@ public class Controller implements CS355Controller
 	private double scaleFactor = 1.0d;
 	private final int VIEWSIZE = 512;
 	private boolean displayHouse = false;
+	private boolean displayBackground = false;
+	private Image2D backgroundImage = null;
 	private Camera camera = new Camera(new Point3D(0f, 5f, -25f));
 	private final float step = 1.2f;
 
@@ -1027,6 +1031,11 @@ public class Controller implements CS355Controller
 		return this.displayHouse;
 	}
 
+	public boolean isBackgroundVisible()
+	{
+		return this.displayBackground;
+	}
+
 	@Override
 	public void doEdgeDetection()
 	{
@@ -1044,42 +1053,65 @@ public class Controller implements CS355Controller
 	@Override
 	public void doMedianBlur()
 	{
-		// TODO Auto-generated method stub
-
+		this.backgroundImage.medianBlur();
+		GUIFunctions.refresh();
 	}
 
 	@Override
 	public void doUniformBlur()
 	{
-		// TODO Auto-generated method stub
-
+		this.backgroundImage.uniformBlur();
+		GUIFunctions.refresh();
 	}
 
 	@Override
 	public void doChangeContrast(int contrastAmountNum)
 	{
-		// TODO Auto-generated method stub
+		this.backgroundImage.changeContrast(contrastAmountNum);
+		GUIFunctions.refresh();
 
 	}
 
 	@Override
 	public void doChangeBrightness(int brightnessAmountNum)
 	{
-		// TODO Auto-generated method stub
-
+		this.backgroundImage.changeBrightness(brightnessAmountNum);
+		GUIFunctions.refresh();
 	}
 
 	@Override
 	public void doLoadImage(BufferedImage openImage)
 	{
-		// TODO Auto-generated method stub
+		int width = openImage.getRaster().getWidth();
+		int height = openImage.getRaster().getHeight();
+		int[][] tempImage = new int[width][height];
+		int[] tempArray = new int[width * height * 3];
+		openImage.getRaster().getPixels(0, 0, width, height, tempArray);
 
+		for (int i = 0, row = 0, col = 0; i < tempArray.length; i += 3)
+		{
+			double gray = (tempArray[i] + tempArray[i + 1] + tempArray[i + 2]) / 3.0;
+			tempImage[col][row] = (int) Math.round(gray);
+			col++;
+			if (col == width)
+			{
+				col = 0;
+				row++;
+			}
+		}
+		this.backgroundImage = new Image2D(tempImage);
+	}
+
+	public Image2D getBackgroundImage()
+	{
+		return this.backgroundImage;
 	}
 
 	@Override
 	public void toggleBackgroundDisplay()
 	{
-		// TODO Auto-generated method stub
+		this.displayBackground = !this.displayBackground;
 
+		GUIFunctions.refresh();
 	}
 }
