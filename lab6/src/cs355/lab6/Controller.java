@@ -52,6 +52,7 @@ public class Controller implements CS355Controller
 	private int triCornCount = 0;
 	private double scaleFactor = 1.0d;
 	private final int VIEWSIZE = 512;
+	private final int SCREENSIZE = 2048;
 	private boolean displayHouse = false;
 	private boolean displayBackground = false;
 	private Image2D backgroundImage = null;
@@ -78,6 +79,11 @@ public class Controller implements CS355Controller
 	}
 
 	// Methods
+
+	public int getScreenSize()
+	{
+		return this.SCREENSIZE;
+	}
 
 	public void setMouseButtonState(MouseButtonState mbs)
 	{
@@ -1039,15 +1045,15 @@ public class Controller implements CS355Controller
 	@Override
 	public void doEdgeDetection()
 	{
-		// TODO Auto-generated method stub
-
+		this.backgroundImage.detectEdges();
+		GUIFunctions.refresh();
 	}
 
 	@Override
 	public void doSharpen()
 	{
-		// TODO Auto-generated method stub
-
+		this.backgroundImage.sharpen();
+		GUIFunctions.refresh();
 	}
 
 	@Override
@@ -1100,6 +1106,8 @@ public class Controller implements CS355Controller
 			}
 		}
 		this.backgroundImage = new Image2D(tempImage);
+
+		GUIFunctions.refresh();
 	}
 
 	public Image2D getBackgroundImage()

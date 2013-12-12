@@ -69,8 +69,24 @@ public class View implements ViewRefresher
 
 		if (drawBackground && image != null)
 		{
+			double scaleFactor = Controller.inst().getScaleFactor();
+			Point diff = Controller.inst().getWorldViewDiff();
+			int screensize = Controller.inst().getScreenSize();
+
+			double zero = 0.0d;
+
+			AffineTransform trans = new AffineTransform();
+			trans.translate((screensize / 2.0) - (image.getWidth() / 2.0) * scaleFactor, (screensize / 2.0) - (image.getWidth() / 2.0) * scaleFactor);
+
+			AffineTransform transform = new AffineTransform(scaleFactor, zero, zero, scaleFactor, -scaleFactor * diff.x, -scaleFactor * diff.y);
+			transform.translate(1024 - image.getWidth() / 2, 1024 - image.getHeight() / 2);
+
+			// g2d.setTransform(trans);
+
 			BufferedImage bgImage = this.getImageFromArray(image.getPixelsSingleArray(), image.getWidth(), image.getHeight());
-			g2d.drawImage(bgImage, null, 0, 0);
+			g2d.drawImage(bgImage, (int) (-1 * diff.x * scaleFactor), (int) (-1 * diff.y * scaleFactor), (int) (image.getWidth() * scaleFactor),
+					(int) (image.getHeight() * scaleFactor), null);
+			g2d.setTransform(new AffineTransform());
 		}
 
 		for (int i = 0; i < Model.inst().size(); i++)

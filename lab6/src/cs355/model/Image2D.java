@@ -62,13 +62,19 @@ public class Image2D
 
 	public void changeBrightness(int deltaBrightness)
 	{
-		for (int row = 0; row < this.height; row++)
-			for (int col = 0; col < this.width; col++)
+		for (int i = 0, row = 0, col = 0; i < this.width * this.height; i++)
+		{
+			this.pixels[col][row] += deltaBrightness;
+			if (this.pixels[col][row] < 0) this.pixels[col][row] = 0;
+			if (this.pixels[col][row] > 255) this.pixels[col][row] = 255;
+
+			col++;
+			if (col == width)
 			{
-				this.pixels[col][row] += deltaBrightness;
-				if (this.pixels[col][row] < 0) this.pixels[col][row] = 0;
-				if (this.pixels[col][row] > 255) this.pixels[col][row] = 255;
+				col = 0;
+				row++;
 			}
+		}
 	}
 
 	public Image2D deepCopy()
@@ -349,6 +355,156 @@ public class Image2D
 		this.pixels = newPixels;
 	}
 
+	public void sharpen()
+	{
+		int[][] newPixels = new int[this.width][this.height];
+
+		for (int i = 0, row = 0, col = 0; i < this.width * this.height; i++)
+		{
+			if (row == 0)
+			{
+				if (col == 0)
+				{
+					newPixels[col][row] = (int) Math.round((6 * this.pixels[col][row] - this.pixels[col + 1][row] - this.pixels[col][row + 1]) / 2.0);
+				}
+				else if (col == this.width - 1)
+				{
+					newPixels[col][row] = (int) Math
+							.round((-this.pixels[col - 1][row] + 6 * this.pixels[col][row] - this.pixels[col][row + 1]) / 2.0);
+				}
+				else
+				{
+					newPixels[col][row] = (int) Math
+							.round((-this.pixels[col - 1][row] + 6 * this.pixels[col][row] - this.pixels[col + 1][row] - this.pixels[col][row + 1]) / 2.0);
+				}
+			}
+			else if (row == this.height - 1)
+			{
+				if (col == 0)
+				{
+					newPixels[col][row] = (int) Math
+							.round((-this.pixels[col][row - 1] + 6 * this.pixels[col][row] - this.pixels[col + 1][row]) / 2.0);
+				}
+				else if (col == this.width - 1)
+				{
+					newPixels[col][row] = (int) Math
+							.round((-this.pixels[col][row - 1] - this.pixels[col - 1][row] + 6 * this.pixels[col][row]) / 2.0);
+				}
+				else
+				{
+					newPixels[col][row] = (int) Math
+							.round((-this.pixels[col][row - 1] - this.pixels[col - 1][row] + 6 * this.pixels[col][row] - this.pixels[col + 1][row]) / 2.0);
+				}
+			}
+			else
+			{
+				if (col == 0)
+				{
+					newPixels[col][row] = (int) Math
+							.round((-this.pixels[col][row - 1] + 6 * this.pixels[col][row] - this.pixels[col + 1][row] - this.pixels[col][row + 1]) / 2.0);
+				}
+				else if (col == this.width - 1)
+				{
+					newPixels[col][row] = (int) Math
+							.round((-this.pixels[col][row - 1] - this.pixels[col - 1][row] + 6 * this.pixels[col][row] - this.pixels[col][row + 1]) / 2.0);
+				}
+				else
+				{
+					newPixels[col][row] = (int) Math.round((-this.pixels[col][row - 1] - this.pixels[col - 1][row] + 6 * this.pixels[col][row]
+							- this.pixels[col + 1][row] - this.pixels[col][row + 1]) / 2.0);
+				}
+			}
+
+			col++;
+			if (col == this.width)
+			{
+				col = 0;
+				row++;
+			}
+		}
+
+		this.pixels = newPixels;
+	}
+
+	public void detectEdges()
+	{
+		int[][] newPixels = new int[this.width][this.height];
+
+		for (int i = 0, row = 0, col = 0; i < this.width * this.height; i++)
+		{
+			float x;
+			float y;
+
+			if (row == 0)
+			{
+				if (col == 0)
+				{
+					x = (2 * this.pixels[col + 1][row] + this.pixels[col + 1][row + 1]) / 8.0f;
+					y = (2 * this.pixels[col][row + 1] + this.pixels[col + 1][row + 1]) / 8.0f;
+				}
+				else if (col == this.width - 1)
+				{
+					x = (-2 * this.pixels[col - 1][row] - this.pixels[col - 1][row + 1]) / 8.0f;
+					y = (this.pixels[col - 1][row + 1] + 2 * this.pixels[col][row + 1]) / 8.0f;
+				}
+				else
+				{
+					x = (-2 * this.pixels[col - 1][row] + 2 * this.pixels[col + 1][row] - this.pixels[col - 1][row + 1] + this.pixels[col + 1][row + 1]) / 8.0f;
+					y = (this.pixels[col - 1][row + 1] + 2 * this.pixels[col][row + 1] + this.pixels[col + 1][row + 1]) / 8.0f;
+				}
+			}
+			else if (row == this.height - 1)
+			{
+				if (col == 0)
+				{
+					x = (this.pixels[col + 1][row - 1] + 2 * this.pixels[col + 1][row]) / 8.0f;
+					y = (-2 * this.pixels[col][row - 1] - this.pixels[col + 1][row - 1]) / 8.0f;
+				}
+				else if (col == this.width - 1)
+				{
+					x = (-this.pixels[col - 1][row - 1] - 2 * this.pixels[col - 1][row]) / 8.0f;
+					y = (-this.pixels[col - 1][row - 1] - 2 * this.pixels[col][row - 1]) / 8.0f;
+				}
+				else
+				{
+					x = (-this.pixels[col - 1][row - 1] + this.pixels[col + 1][row - 1] - 2 * this.pixels[col - 1][row] + 2 * this.pixels[col + 1][row]) / 8.0f;
+					y = (-this.pixels[col - 1][row - 1] - 2 * this.pixels[col][row - 1] - this.pixels[col + 1][row - 1]) / 8.0f;
+				}
+			}
+			else
+			{
+				if (col == 0)
+				{
+					x = (this.pixels[col + 1][row - 1] + 2 * this.pixels[col + 1][row] + this.pixels[col + 1][row + 1]) / 8.0f;
+					y = (-2 * this.pixels[col][row - 1] - this.pixels[col + 1][row - 1] + 2 * this.pixels[col][row + 1] + this.pixels[col + 1][row + 1]) / 8.0f;
+				}
+				else if (col == this.width - 1)
+				{
+					x = (-this.pixels[col - 1][row - 1] - 2 * this.pixels[col - 1][row] - this.pixels[col - 1][row + 1]) / 8.0f;
+					y = (-this.pixels[col - 1][row - 1] - 2 * this.pixels[col][row - 1] + this.pixels[col - 1][row + 1] + 2 * this.pixels[col][row + 1]) / 8.0f;
+				}
+				else
+				{
+					x = (-this.pixels[col - 1][row - 1] + this.pixels[col + 1][row - 1] - 2 * this.pixels[col - 1][row] + 2
+							* this.pixels[col + 1][row] - this.pixels[col - 1][row + 1] + this.pixels[col + 1][row + 1]) / 8.0f;
+					y = (-this.pixels[col - 1][row - 1] - 2 * this.pixels[col][row - 1] - this.pixels[col + 1][row - 1]
+							+ this.pixels[col - 1][row + 1] + 2 * this.pixels[col][row + 1] + this.pixels[col + 1][row + 1]) / 8.0f;
+				}
+			}
+
+			newPixels[col][row] = (int) Math.round(Math.sqrt(Math.pow(x, 2.0) + Math.pow(y, 2.0)));
+
+			col++;
+			if (col == width)
+			{
+				col = 0;
+				row++;
+			}
+		}
+
+		this.pixels = newPixels;
+	}
+
 	// array input must be sorted
 	public double findMedian(ArrayList<Double> sortedInput)
 	{
@@ -362,5 +518,4 @@ public class Image2D
 			return (sortedInput.get(middle - 1) + sortedInput.get(middle)) / 2.0;
 		}
 	}
-
 }
